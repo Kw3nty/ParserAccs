@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ParserAccs — парсинг кабинетов Facebook Ads</title>
-<meta name="description" content="Букмарклет для массового парсинга рекламных кабинетов Facebook Ads Manager: баланс, траты по периоду, лимиты, биллинг, статусы объявлений, привязка к BM и экспорт в CSV.">
+<title>ParserAccs — Facebook Ads parser bookmarklet</title>
+<meta name="description" content="Bookmarklet for bulk parsing of Facebook Ads Manager accounts: balance, spend by period, limits, billing, ad status, BM mapping and CSV export.">
 <meta name="theme-color" content="#0b0d11">
 <style>
   :root{
@@ -21,13 +21,27 @@
   }
   #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
   .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 22px}
+  [data-i18n],[data-i18n-html]{transition:opacity .25s ease}
+  .i18n-fade{opacity:0}
 
   header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:20px 0}
   .logo{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;font-size:18px;letter-spacing:.4px;
     background:linear-gradient(92deg,#fff,#2dd4bf 60%,#3b8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .h-right{display:flex;align-items:center;gap:12px}
   .gh{display:inline-flex;align-items:center;gap:7px;color:var(--mut);text-decoration:none;font-size:13px;font-weight:600;
     border:1px solid var(--line);border-radius:20px;padding:7px 14px;transition:.18s}
   .gh:hover{color:var(--teal);border-color:var(--teal);transform:translateY(-1px)}
+
+  /* тумблер языка */
+  .langsw{position:relative;display:inline-flex;align-items:center;background:var(--bg2);border:1px solid var(--line);
+    border-radius:20px;padding:3px;cursor:pointer;user-select:none;font-family:ui-monospace,monospace}
+  .langsw .opt{position:relative;z-index:2;font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--mut);
+    padding:5px 12px;border-radius:16px;transition:color .2s}
+  .langsw .opt.on{color:#06120f}
+  .langsw .knob{position:absolute;z-index:1;top:3px;left:3px;height:calc(100% - 6px);width:calc(50% - 3px);
+    border-radius:16px;background:linear-gradient(135deg,#2dd4bf,#3b8cff);box-shadow:0 2px 10px rgba(45,212,191,.35);
+    transition:transform .26s cubic-bezier(.34,1.4,.5,1)}
+  .langsw.en .knob{transform:translateX(100%)}
 
   .hero{text-align:center;padding:46px 0 30px}
   .hero h1{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;letter-spacing:.5px;
@@ -65,7 +79,9 @@
   .drag-hint{margin-top:16px;font-size:13px;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:8px}
   .drag-hint .arrow{font-size:18px;color:var(--teal);animation:bob 1.4s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .lang-note{margin-top:10px;font-size:11px;color:var(--mut)}
+  .lang-note b{color:var(--teal)}
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
   .copy-btn{font-family:inherit;font-weight:700;font-size:13px;color:var(--txt);cursor:pointer;
     background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 20px;transition:.15s}
   .copy-btn:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px)}
@@ -115,77 +131,83 @@
 <div class="wrap">
   <header>
     <div class="logo">ParserAccs</div>
-    <a class="gh" href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      GitHub
-    </a>
+    <div class="h-right">
+      <div id="langsw" class="langsw" role="switch" aria-label="Language">
+        <span class="knob"></span>
+        <span class="opt" data-lang="ru">RU</span>
+        <span class="opt" data-lang="en">EN</span>
+      </div>
+      <a class="gh" href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
   </header>
 
   <div class="hero">
     <h1>ParserAccs</h1>
-    <p class="lead">Букмарклет для массового парсинга кабинетов Facebook Ads Manager — баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений и привязка к BM в одной таблице с экспортом в CSV.</p>
+    <p class="lead" data-i18n="lead"></p>
     <div class="tags">
-      <span class="tag">Graph API v20.0</span>
-      <span class="tag">Read-only</span>
-      <span class="tag">Без установки</span>
-      <span class="tag">CSV для Excel</span>
+      <span class="tag" data-i18n="tag1"></span>
+      <span class="tag" data-i18n="tag2"></span>
+      <span class="tag" data-i18n="tag3"></span>
+      <span class="tag" data-i18n="tag4"></span>
     </div>
   </div>
 
   <div class="install">
-    <div class="hint-bar">Сначала покажи панель закладок: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)</div>
+    <div class="hint-bar" data-i18n-html="hint"></div>
 
-    <a id="bm-link" class="bm-btn loading" href="javascript:void(0)" title="Перетащи меня на панель закладок">⏳ подготовка…</a>
+    <a id="bm-link" class="bm-btn loading" href="javascript:void(0)" title="Drag me to your bookmarks bar">⏳ …</a>
 
-    <div class="drag-hint"><span class="arrow">↑</span> перетащи кнопку на панель закладок</div>
+    <div class="drag-hint"><span class="arrow">↑</span> <span data-i18n="drag"></span></div>
+    <div class="lang-note" data-i18n-html="langnote"></div>
 
     <div class="actions">
-      <button id="bm-copy" class="copy-btn">📋 Скопировать код</button>
+      <button id="bm-copy" class="copy-btn" data-i18n="copybtn"></button>
     </div>
 
-    <div id="warn" class="warn">⚠ <span class="pa-wmsg">Код букмарклета не подгрузился.</span> Проверь, что файл <code>parseraccs.js</code> лежит в корне репозитория рядом с <code>index.html</code> и называется ровно так (строчными). Открыть напрямую: <a href="./parseraccs.js" target="_blank">./parseraccs.js</a> · на GitHub: <a href="https://github.com/Kw3nty/ParserAccs/blob/main/parseraccs.js" target="_blank">репозиторий</a>. Если по прямой ссылке 404 — имя файла не совпало.</div>
+    <div id="warn" class="warn" data-i18n-html="warn"></div>
   </div>
 
   <section class="block">
-    <h2 class="sec-title">Как установить</h2>
-    <p class="sec-sub">Никаких расширений и установок — одна закладка</p>
+    <h2 class="sec-title" data-i18n="how_t"></h2>
+    <p class="sec-sub" data-i18n="how_s"></p>
     <div class="steps">
-      <div class="step"><span class="n">1</span><h3>Покажи панель закладок</h3><p>Нажми <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>, чтобы сверху появилась полоса закладок.</p></div>
-      <div class="step"><span class="n">2</span><h3>Перетащи кнопку</h3><p>Зажми кнопку <b>ParserAccs</b> выше и брось её на панель закладок. На телефоне — нажми «Скопировать код» и создай закладку вручную.</p></div>
-      <div class="step"><span class="n">3</span><h3>Запусти в Ads Manager</h3><p>Открой Facebook Ads Manager и кликни по закладке. Готово — таблица кабинетов перед тобой.</p></div>
+      <div class="step"><span class="n">1</span><h3 data-i18n="s1t"></h3><p data-i18n-html="s1p"></p></div>
+      <div class="step"><span class="n">2</span><h3 data-i18n="s2t"></h3><p data-i18n="s2p"></p></div>
+      <div class="step"><span class="n">3</span><h3 data-i18n="s3t"></h3><p data-i18n="s3p"></p></div>
     </div>
   </section>
 
   <section class="block">
-    <h2 class="sec-title">Что умеет</h2>
+    <h2 class="sec-title" data-i18n="feat_t"></h2>
     <div class="feats">
-      <div class="feat"><div class="ic">📊</div><h3>Полная сводка</h3><p>ID, имя, статус, баланс, валюта, траты за всё время и за период, лимит, биллинг, активные и отклонённые объявления, BM.</p></div>
-      <div class="feat"><div class="ic">📅</div><h3>Любой период</h3><p>Today, Yesterday, 7/14/30 дней, месяц, Lifetime и свои даты. Популярные периоды — мгновенно из кэша.</p></div>
-      <div class="feat"><div class="ic">🔍</div><h3>Фильтры и поиск</h3><p>Все / Активные / Неактивные, поиск по ID, имени и BM, сортировка по любой колонке.</p></div>
-      <div class="feat"><div class="ic">☑️</div><h3>Выделение</h3><p>Отмечай кабинеты чекбоксами и копируй ID или выгружай CSV только по выбранным.</p></div>
-      <div class="feat"><div class="ic">📄</div><h3>CSV для Excel</h3><p>Кириллица и разделитель <code>sep=,</code> — файл сразу разъезжается по столбцам.</p></div>
-      <div class="feat"><div class="ic">🔒</div><h3>Read-only</h3><p>Только чтение через официальный Graph API. Скрипт ничего не меняет в кабинетах.</p></div>
+      <div class="feat"><div class="ic">📊</div><h3 data-i18n="f1t"></h3><p data-i18n="f1p"></p></div>
+      <div class="feat"><div class="ic">📅</div><h3 data-i18n="f2t"></h3><p data-i18n="f2p"></p></div>
+      <div class="feat"><div class="ic">🔍</div><h3 data-i18n="f3t"></h3><p data-i18n="f3p"></p></div>
+      <div class="feat"><div class="ic">☑️</div><h3 data-i18n="f4t"></h3><p data-i18n="f4p"></p></div>
+      <div class="feat"><div class="ic">📄</div><h3 data-i18n="f5t"></h3><p data-i18n="f5p"></p></div>
+      <div class="feat"><div class="ic">🔒</div><h3 data-i18n="f6t"></h3><p data-i18n="f6p"></p></div>
     </div>
   </section>
 
   <section class="block">
-    <h2 class="sec-title">Как выглядит</h2>
+    <h2 class="sec-title" data-i18n="look_t"></h2>
     <div class="shots">
-      <div class="shot"><a href="preview.jpg" target="_blank" rel="noopener"><img src="preview.jpg" alt="Главное окно ParserAccs" loading="lazy" onerror="this.style.display='none'"></a><div class="cap">Сводка по кабинетам, фильтры и периоды</div></div>
-      <div class="shot"><a href="recount.png" target="_blank" rel="noopener"><img src="recount.png" alt="Оверлей пересчёта трат" loading="lazy" onerror="this.style.display='none'"></a><div class="cap">Оверлей пересчёта трат по периоду</div></div>
+      <div class="shot"><a href="preview.jpg" target="_blank" rel="noopener"><img src="preview.jpg" alt="ParserAccs main window" loading="lazy" onerror="this.style.display='none'"></a><div class="cap" data-i18n="cap1"></div></div>
+      <div class="shot"><a href="recount.png" target="_blank" rel="noopener"><img src="recount.png" alt="Spend recompute overlay" loading="lazy" onerror="this.style.display='none'"></a><div class="cap" data-i18n="cap2"></div></div>
     </div>
   </section>
 </div>
 
-<footer>
-  Сделал <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Исходники на <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · Лицензия MIT
-</footer>
+<footer data-i18n-html="footer"></footer>
 
 <script>
-/* ===== 1) частицы на весь фон (независимый блок: крах не ломает кнопку) ===== */
+/* ===== частицы на весь фон ===== */
 try{(function(){
   var c=document.getElementById('bg-canvas');
-  if(!c){console.warn('[ParserAccs] canvas не найден в DOM');return;}
+  if(!c){return;}
   var x=c.getContext('2d');if(!x)return;
   var w,h,p=[],COLS=['45,212,191','45,212,191','45,212,191','59,140,255','167,139,250'],
       mouse={x:-9999,y:-9999,on:false};
@@ -199,25 +221,113 @@ try{(function(){
   addEventListener('resize',function(){rs();build();});
   addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;});
   addEventListener('mouseout',function(){mouse.on=false;});
-  console.log('[ParserAccs] particles ok');
-})();}catch(e){console.error('[ParserAccs] particles error',e);}
+})();}catch(e){}
 
-/* ===== 2) загрузка кода букмарклета из parseraccs.js (с таймаутом, не зависает) ===== */
+/* ===== словари лендинга ===== */
+var D={
+ru:{
+ lead:'Букмарклет для массового парсинга кабинетов Facebook Ads Manager — баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений и привязка к BM в одной таблице с экспортом в CSV.',
+ tag1:'Graph API v20.0',tag2:'Read-only',tag3:'Без установки',tag4:'CSV для Excel',
+ hint:'Сначала покажи панель закладок: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)',
+ drag:'перетащи кнопку на панель закладок',
+ langnote:'Язык интерфейса парсера задаётся здесь: перетащенная закладка откроется на <b>выбранном языке</b>. По умолчанию — язык твоего браузера (прокси не влияют).',
+ copybtn:'📋 Скопировать код',
+ warn:'⚠ <span class="pa-wmsg">Код букмарклета не подгрузился.</span> Проверь, что файл <code>parseraccs.js</code> лежит в корне репозитория рядом с <code>index.html</code>. Прямая ссылка: <a href="./parseraccs.js" target="_blank">./parseraccs.js</a>.',
+ how_t:'Как установить',how_s:'Никаких расширений и установок — одна закладка',
+ s1t:'Покажи панель закладок',s1p:'Нажми <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>, чтобы сверху появилась полоса закладок.',
+ s2t:'Перетащи кнопку',s2p:'Зажми кнопку ParserAccs выше и брось её на панель закладок. На телефоне — «Скопировать код» и создай закладку вручную.',
+ s3t:'Запусти в Ads Manager',s3p:'Открой Facebook Ads Manager и кликни по закладке. Готово — таблица кабинетов перед тобой.',
+ feat_t:'Что умеет',
+ f1t:'Полная сводка',f1p:'ID, имя, статус, баланс, валюта, траты за всё время и за период, лимит, биллинг, активные и отклонённые объявления, BM.',
+ f2t:'Любой период',f2p:'Today, Yesterday, 7/14/30 дней, месяц, Lifetime и свои даты. Популярные периоды — мгновенно из кэша.',
+ f3t:'Фильтры и поиск',f3p:'Все / Активные / Неактивные, поиск по ID, имени и BM, сортировка по любой колонке.',
+ f4t:'Выделение',f4p:'Отмечай кабинеты чекбоксами и копируй ID или выгружай CSV только по выбранным.',
+ f5t:'CSV для Excel',f5p:'Кириллица и разделитель sep=, — файл сразу разъезжается по столбцам.',
+ f6t:'Read-only',f6p:'Только чтение через официальный Graph API. Скрипт ничего не меняет в кабинетах.',
+ look_t:'Как выглядит',
+ cap1:'Сводка по кабинетам, фильтры и периоды',cap2:'Оверлей пересчёта трат по периоду',
+ footer:'Сделал <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Исходники на <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · Лицензия MIT'
+},
+en:{
+ lead:'A bookmarklet for bulk parsing of Facebook Ads Manager accounts — balance, spend for any period, daily limits, billing threshold, ad status and BM mapping in one table with CSV export.',
+ tag1:'Graph API v20.0',tag2:'Read-only',tag3:'No install',tag4:'Excel-ready CSV',
+ hint:'First show the bookmarks bar: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)',
+ drag:'drag the button onto your bookmarks bar',
+ langnote:'The parser UI language is set here: the installed bookmark opens in the <b>selected language</b>. Default = your browser language (proxies don\'t affect it).',
+ copybtn:'📋 Copy code',
+ warn:'⚠ <span class="pa-wmsg">Bookmarklet code failed to load.</span> Make sure <code>parseraccs.js</code> sits in the repo root next to <code>index.html</code>. Direct link: <a href="./parseraccs.js" target="_blank">./parseraccs.js</a>.',
+ how_t:'How to install',how_s:'No extensions, no setup — a single bookmark',
+ s1t:'Show the bookmarks bar',s1p:'Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> so the bookmarks bar appears on top.',
+ s2t:'Drag the button',s2p:'Grab the ParserAccs button above and drop it on the bookmarks bar. On mobile — copy the code and create a bookmark manually.',
+ s3t:'Run it in Ads Manager',s3p:'Open Facebook Ads Manager and click the bookmark. Done — the accounts table is yours.',
+ feat_t:'What it does',
+ f1t:'Full overview',f1p:'ID, name, status, balance, currency, lifetime and period spend, limit, billing, active and disapproved ads, BM.',
+ f2t:'Any period',f2p:'Today, Yesterday, 7/14/30 days, month, Lifetime and custom dates. Popular periods are instant from cache.',
+ f3t:'Filters & search',f3p:'All / Active / Disabled, search by ID, name and BM, sort by any column.',
+ f4t:'Selection',f4p:'Tick accounts with checkboxes and copy IDs or export CSV for the selected ones only.',
+ f5t:'Excel-ready CSV',f5p:'UTF-8 BOM and the sep=, hint — the file splits into columns on open.',
+ f6t:'Read-only',f6p:'Reads only, via the official Graph API. The script changes nothing in your accounts.',
+ look_t:'How it looks',
+ cap1:'Accounts overview, filters and periods',cap2:'Spend recompute overlay',
+ footer:'Built by <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Source on <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · MIT License'
+}
+};
+
+/* ===== язык: дефолт = память || язык браузера (НЕ ip — прокси ломают ip) ===== */
+function detectLang(){
+  try{var s=localStorage.getItem('pa_site_lang');if(s==='ru'||s==='en')return s;}catch(e){}
+  var nl=(navigator.language||navigator.userLanguage||'').toLowerCase();
+  return nl.indexOf('ru')===0?'ru':'en';
+}
+var siteLang=detectLang();
+
+function applyLang(lang,animate){
+  siteLang=lang;
+  try{localStorage.setItem('pa_site_lang',lang);}catch(e){}
+  document.documentElement.lang=lang;
+  var sw=document.getElementById('langsw');
+  if(sw){sw.classList.toggle('en',lang==='en');sw.querySelectorAll('.opt').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-lang')===lang);});}
+  var nodes=document.querySelectorAll('[data-i18n],[data-i18n-html]');
+  var paint=function(){
+    nodes.forEach(function(el){
+      var k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-html');
+      var v=(D[lang]&&D[lang][k]!=null)?D[lang][k]:(D.ru[k]!=null?D.ru[k]:'');
+      if(el.hasAttribute('data-i18n-html'))el.innerHTML=v;else el.textContent=v;
+    });
+    /* код закладки зависит от языка сайта */
+    if(window.__pa_code_ru){
+      var code=(lang==='en')?window.__pa_code_en:window.__pa_code_ru;
+      window.__pa_cur_code=code;
+      var link=document.getElementById('bm-link');
+      if(link&&!link.classList.contains('loading'))link.href=code;
+    }
+    if(animate)nodes.forEach(function(el){el.classList.remove('i18n-fade');});
+  };
+  if(animate){nodes.forEach(function(el){el.classList.add('i18n-fade');});setTimeout(paint,180);}
+  else paint();
+}
+
+document.getElementById('langsw').addEventListener('click',function(){
+  applyLang(siteLang==='ru'?'en':'ru',true);
+});
+
+/* ===== подгрузка кода букмарклета + сборка RU/EN вариантов ===== */
 try{(function(){
   var link=document.getElementById('bm-link'),
       copy=document.getElementById('bm-copy'),
       warn=document.getElementById('warn'),
-      drag=document.querySelector('.drag-hint'),
-      code=null;
+      drag=document.querySelector('.drag-hint');
 
   function setReady(src){
-    code=src;
-    link.href=src;
+    window.__pa_code_ru=src;
+    window.__pa_code_en=src.replace(/^javascript:/,'javascript:var PA_LANG="en";');
+    window.__pa_cur_code=(siteLang==='en')?window.__pa_code_en:window.__pa_code_ru;
+    link.href=window.__pa_cur_code;
     link.classList.remove('loading');
     link.textContent='📌 ParserAccs';
-    link.title='Перетащи меня на панель закладок';
+    link.title=(siteLang==='en'?'Drag me to your bookmarks bar':'Перетащи меня на панель закладок');
     if(drag)drag.style.display='flex';
-    console.log('[ParserAccs] code loaded, bytes='+src.length);
+    applyLang(siteLang,false);
   }
   function setFail(msg){
     link.classList.remove('loading');
@@ -226,33 +336,31 @@ try{(function(){
     if(drag)drag.style.display='none';
     warn.style.display='block';
     if(msg){var m=warn.querySelector('.pa-wmsg');if(m)m.textContent=msg;}
-    console.warn('[ParserAccs] load fail:',msg);
   }
 
-  /* клик по кнопке НА ЛЕНДИНГЕ не запускает парсер — только перетаскивание */
   link.addEventListener('click',function(e){e.preventDefault();});
 
   var ctrl=null;try{ctrl=new AbortController();}catch(e){}
-  var tm=setTimeout(function(){try{ctrl&&ctrl.abort();}catch(e){}setFail('Таймаут загрузки parseraccs.js (6с) — файл не ответил.');},6000);
+  var tm=setTimeout(function(){try{ctrl&&ctrl.abort();}catch(e){}setFail('timeout 6s');},6000);
   var opt={cache:'no-store'};if(ctrl)opt.signal=ctrl.signal;
 
   fetch('./parseraccs.js',opt)
     .then(function(r){clearTimeout(tm);if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
-    .then(function(t){
-      t=(t||'').replace(/^\uFEFF/,'').trim();
-      if(t.indexOf('javascript:')===0){setReady(t);}
-      else{setFail('Файл parseraccs.js найден, но не начинается с javascript: — проверь его содержимое.');}
-    })
-    .catch(function(e){clearTimeout(tm);setFail('Не удалось загрузить parseraccs.js: '+(e&&e.message?e.message:e)+'. Открой прямую ссылку ниже.');});
+    .then(function(t){t=(t||'').replace(/^\uFEFF/,'').trim();if(t.indexOf('javascript:')===0)setReady(t);else setFail('no javascript: prefix');})
+    .catch(function(e){clearTimeout(tm);setFail(String(e&&e.message||e));});
 
   copy.addEventListener('click',function(){
+    var code=window.__pa_cur_code;
     if(!code){warn.style.display='block';return;}
-    var btn=this,done=function(){btn.classList.add('ok');var o=btn.textContent;btn.textContent='✓ Скопировано';setTimeout(function(){btn.classList.remove('ok');btn.textContent=o;},1600);};
+    var btn=this,done=function(){btn.classList.add('ok');var o=btn.textContent;btn.textContent=(siteLang==='en'?'✓ Copied':'✓ Скопировано');setTimeout(function(){btn.classList.remove('ok');btn.textContent=D[siteLang].copybtn;},1600);};
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done).catch(fallback);}
     else fallback();
     function fallback(){var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();}
   });
-})();}catch(e){console.error('[ParserAccs] loader error',e);}
+})();}catch(e){}
+
+/* первичная отрисовка текста (код подтянется асинхронно и допереведёт кнопку) */
+applyLang(siteLang,false);
 </script>
 </body>
 </html>
