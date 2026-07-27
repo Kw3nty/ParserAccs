@@ -22,7 +22,6 @@
   #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
   .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 22px}
 
-  /* шапка */
   header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:20px 0}
   .logo{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;font-size:18px;letter-spacing:.4px;
     background:linear-gradient(92deg,#fff,#2dd4bf 60%,#3b8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -30,7 +29,6 @@
     border:1px solid var(--line);border-radius:20px;padding:7px 14px;transition:.18s}
   .gh:hover{color:var(--teal);border-color:var(--teal);transform:translateY(-1px)}
 
-  /* hero */
   .hero{text-align:center;padding:46px 0 30px}
   .hero h1{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;letter-spacing:.5px;
     font-size:clamp(38px,7vw,72px);line-height:1.02;
@@ -44,7 +42,6 @@
   .tag{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--teal);background:rgba(45,212,191,.1);
     border:1px solid rgba(45,212,191,.3);border-radius:20px;padding:5px 12px}
 
-  /* зона установки */
   .install{margin:38px auto 0;max-width:760px;text-align:center;
     background:linear-gradient(180deg,rgba(26,28,33,.7),rgba(20,21,25,.5));
     border:1px solid var(--line);border-radius:20px;padding:34px 26px;position:relative;overflow:hidden}
@@ -55,7 +52,6 @@
   .hint-bar kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);
     border-radius:5px;padding:1px 7px;font-size:11px;color:var(--teal)}
 
-  /* кнопка-букмарклет */
   .bm-btn{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:grab;user-select:none;
     font-family:'Space Grotesk',system-ui,sans-serif;font-weight:800;font-size:20px;letter-spacing:.3px;color:#06120f;
     background:linear-gradient(135deg,#2dd4bf,#3b8cff);border:none;border-radius:16px;padding:18px 38px;text-decoration:none;
@@ -75,15 +71,15 @@
   .copy-btn:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px)}
   .copy-btn.ok{background:var(--green);color:#06120f;border-color:var(--green)}
   .warn{display:none;margin-top:18px;font-size:12px;color:var(--amber);background:rgba(245,177,61,.08);
-    border:1px solid rgba(245,177,61,.3);border-radius:10px;padding:10px 14px}
+    border:1px solid rgba(245,177,61,.3);border-radius:10px;padding:10px 14px;line-height:1.6;text-align:left}
+  .warn a{color:var(--teal);font-weight:700}
+  .warn code{font-family:ui-monospace,monospace;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px}
 
-  /* секции */
   section.block{padding:60px 0 10px}
   .sec-title{font-family:'Space Grotesk',system-ui,sans-serif;font-weight:800;font-size:clamp(24px,4vw,34px);
     text-align:center;letter-spacing:.3px}
   .sec-sub{text-align:center;color:var(--mut);margin-top:8px;font-size:14px}
 
-  /* шаги */
   .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:34px}
   .step{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:22px;position:relative;transition:.2s}
   .step:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px)}
@@ -93,7 +89,6 @@
   .step p{font-size:13px;color:var(--mut)}
   .step kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:11px;color:var(--teal)}
 
-  /* фичи */
   .feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:34px}
   .feat{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.2s}
   .feat:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -101,7 +96,6 @@
   .feat h3{font-size:15px;margin-bottom:6px}
   .feat p{font-size:13px;color:var(--mut)}
 
-  /* скрины */
   .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:34px}
   .shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg1);transition:.2s}
   .shot:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
@@ -149,7 +143,7 @@
       <button id="bm-copy" class="copy-btn">📋 Скопировать код</button>
     </div>
 
-    <div id="warn" class="warn">⚠ Код букмарклета не подгрузился. Если открыл файл с диска — запусти локальный сервер или открой сайт на GitHub Pages. Либо скопируй код из <code>parseraccs.js</code> и создай закладку вручную.</div>
+    <div id="warn" class="warn">⚠ <span class="pa-wmsg">Код букмарклета не подгрузился.</span> Проверь, что файл <code>parseraccs.js</code> лежит в корне репозитория рядом с <code>index.html</code> и называется ровно так (строчными). Открыть напрямую: <a href="./parseraccs.js" target="_blank">./parseraccs.js</a> · на GitHub: <a href="https://github.com/Kw3nty/ParserAccs/blob/main/parseraccs.js" target="_blank">репозиторий</a>. Если по прямой ссылке 404 — имя файла не совпало.</div>
   </div>
 
   <section class="block">
@@ -163,4 +157,102 @@
   </section>
 
   <section class="block">
-   
+    <h2 class="sec-title">Что умеет</h2>
+    <div class="feats">
+      <div class="feat"><div class="ic">📊</div><h3>Полная сводка</h3><p>ID, имя, статус, баланс, валюта, траты за всё время и за период, лимит, биллинг, активные и отклонённые объявления, BM.</p></div>
+      <div class="feat"><div class="ic">📅</div><h3>Любой период</h3><p>Today, Yesterday, 7/14/30 дней, месяц, Lifetime и свои даты. Популярные периоды — мгновенно из кэша.</p></div>
+      <div class="feat"><div class="ic">🔍</div><h3>Фильтры и поиск</h3><p>Все / Активные / Неактивные, поиск по ID, имени и BM, сортировка по любой колонке.</p></div>
+      <div class="feat"><div class="ic">☑️</div><h3>Выделение</h3><p>Отмечай кабинеты чекбоксами и копируй ID или выгружай CSV только по выбранным.</p></div>
+      <div class="feat"><div class="ic">📄</div><h3>CSV для Excel</h3><p>Кириллица и разделитель <code>sep=,</code> — файл сразу разъезжается по столбцам.</p></div>
+      <div class="feat"><div class="ic">🔒</div><h3>Read-only</h3><p>Только чтение через официальный Graph API. Скрипт ничего не меняет в кабинетах.</p></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec-title">Как выглядит</h2>
+    <div class="shots">
+      <div class="shot"><a href="preview.jpg" target="_blank" rel="noopener"><img src="preview.jpg" alt="Главное окно ParserAccs" loading="lazy" onerror="this.style.display='none'"></a><div class="cap">Сводка по кабинетам, фильтры и периоды</div></div>
+      <div class="shot"><a href="recount.png" target="_blank" rel="noopener"><img src="recount.png" alt="Оверлей пересчёта трат" loading="lazy" onerror="this.style.display='none'"></a><div class="cap">Оверлей пересчёта трат по периоду</div></div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  Сделал <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Исходники на <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · Лицензия MIT
+</footer>
+
+<script>
+/* ===== 1) частицы на весь фон (независимый блок: крах не ломает кнопку) ===== */
+try{(function(){
+  var c=document.getElementById('bg-canvas');
+  if(!c){console.warn('[ParserAccs] canvas не найден в DOM');return;}
+  var x=c.getContext('2d');if(!x)return;
+  var w,h,p=[],COLS=['45,212,191','45,212,191','45,212,191','59,140,255','167,139,250'],
+      mouse={x:-9999,y:-9999,on:false};
+  function rs(){w=c.width=innerWidth;h=c.height=innerHeight;}
+  function P(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.s=Math.random()*1.6+.7;this.c=COLS[(Math.random()*COLS.length)|0];}
+  P.prototype.u=function(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;};
+  function build(){p=[];var n=Math.min(130,Math.max(40,Math.round(w*h/13000)));for(var i=0;i<n;i++)p.push(new P());}
+  function line(ax,ay,bx,by,col,a){x.beginPath();x.strokeStyle='rgba('+col+','+a.toFixed(3)+')';x.lineWidth=.6;x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke();}
+  rs();build();
+  (function f(){x.clearRect(0,0,w,h);for(var i=0;i<p.length;i++){var a=p[i];a.u();x.shadowColor='rgba('+a.c+',.8)';x.shadowBlur=6;x.beginPath();x.arc(a.x,a.y,a.s,0,6.2832);x.fillStyle='rgba('+a.c+',.65)';x.fill();x.shadowBlur=0;if(mouse.on){var mdx=a.x-mouse.x,mdy=a.y-mouse.y,md=Math.sqrt(mdx*mdx+mdy*mdy);if(md<160)line(a.x,a.y,mouse.x,mouse.y,a.c,.4*(1-md/160));}for(var j=i+1;j<p.length;j++){var b=p[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<125)line(a.x,a.y,b.x,b.y,'45,212,191',.14*(1-d/125));}}requestAnimationFrame(f);})();
+  addEventListener('resize',function(){rs();build();});
+  addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;});
+  addEventListener('mouseout',function(){mouse.on=false;});
+  console.log('[ParserAccs] particles ok');
+})();}catch(e){console.error('[ParserAccs] particles error',e);}
+
+/* ===== 2) загрузка кода букмарклета из parseraccs.js (с таймаутом, не зависает) ===== */
+try{(function(){
+  var link=document.getElementById('bm-link'),
+      copy=document.getElementById('bm-copy'),
+      warn=document.getElementById('warn'),
+      drag=document.querySelector('.drag-hint'),
+      code=null;
+
+  function setReady(src){
+    code=src;
+    link.href=src;
+    link.classList.remove('loading');
+    link.textContent='📌 ParserAccs';
+    link.title='Перетащи меня на панель закладок';
+    if(drag)drag.style.display='flex';
+    console.log('[ParserAccs] code loaded, bytes='+src.length);
+  }
+  function setFail(msg){
+    link.classList.remove('loading');
+    link.textContent='📌 ParserAccs';
+    link.style.filter='grayscale(.5) brightness(.85)';
+    if(drag)drag.style.display='none';
+    warn.style.display='block';
+    if(msg){var m=warn.querySelector('.pa-wmsg');if(m)m.textContent=msg;}
+    console.warn('[ParserAccs] load fail:',msg);
+  }
+
+  /* клик по кнопке НА ЛЕНДИНГЕ не запускает парсер — только перетаскивание */
+  link.addEventListener('click',function(e){e.preventDefault();});
+
+  var ctrl=null;try{ctrl=new AbortController();}catch(e){}
+  var tm=setTimeout(function(){try{ctrl&&ctrl.abort();}catch(e){}setFail('Таймаут загрузки parseraccs.js (6с) — файл не ответил.');},6000);
+  var opt={cache:'no-store'};if(ctrl)opt.signal=ctrl.signal;
+
+  fetch('./parseraccs.js',opt)
+    .then(function(r){clearTimeout(tm);if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(function(t){
+      t=(t||'').replace(/^\uFEFF/,'').trim();
+      if(t.indexOf('javascript:')===0){setReady(t);}
+      else{setFail('Файл parseraccs.js найден, но не начинается с javascript: — проверь его содержимое.');}
+    })
+    .catch(function(e){clearTimeout(tm);setFail('Не удалось загрузить parseraccs.js: '+(e&&e.message?e.message:e)+'. Открой прямую ссылку ниже.');});
+
+  copy.addEventListener('click',function(){
+    if(!code){warn.style.display='block';return;}
+    var btn=this,done=function(){btn.classList.add('ok');var o=btn.textContent;btn.textContent='✓ Скопировано';setTimeout(function(){btn.classList.remove('ok');btn.textContent=o;},1600);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done).catch(fallback);}
+    else fallback();
+    function fallback(){var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();}
+  });
+})();}catch(e){console.error('[ParserAccs] loader error',e);}
+</script>
+</body>
+</html>
