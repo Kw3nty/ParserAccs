@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParserAccs — парсинг кабинетов Facebook Ads</title>
+<meta name="description" content="Букмарклет для массового парсинга рекламных кабинетов Facebook Ads Manager: баланс, траты по периоду, лимиты, биллинг, статусы объявлений, привязка к BM и экспорт в CSV.">
+<meta name="theme-color" content="#0b0d11">
+<style>
+  :root{
+    --bg0:#0b0d11; --bg1:#141519; --bg2:#1a1c21; --line:#23262e;
+    --txt:#e8eaef; --mut:#9aa0ab; --teal:#2dd4bf; --blue:#3b8cff;
+    --violet:#a78bfa; --amber:#f5b13d; --green:#37d67a; --red:#ff5d6c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'SF Pro Text','Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--bg0); color:var(--txt); line-height:1.6;
+    overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  }
+  #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* шапка */
+  header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+  .logo{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;font-size:18px;letter-spacing:.4px;
+    background:linear-gradient(92deg,#fff,#2dd4bf 60%,#3b8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .gh{display:inline-flex;align-items:center;gap:7px;color:var(--mut);text-decoration:none;font-size:13px;font-weight:600;
+    border:1px solid var(--line);border-radius:20px;padding:7px 14px;transition:.18s}
+  .gh:hover{color:var(--teal);border-color:var(--teal);transform:translateY(-1px)}
+
+  /* hero */
+  .hero{text-align:center;padding:46px 0 30px}
+  .hero h1{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;letter-spacing:.5px;
+    font-size:clamp(38px,7vw,72px);line-height:1.02;
+    background:linear-gradient(92deg,#ffffff 0%,#2dd4bf 42%,#3b8cff 70%,#ffffff 100%);background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:tshift 7s linear infinite,tglow 3.6s ease-in-out infinite}
+  @keyframes tshift{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+  @keyframes tglow{0%,100%{filter:drop-shadow(0 0 0 rgba(45,212,191,0))}50%{filter:drop-shadow(0 0 26px rgba(45,212,191,.35))}}
+  .hero p.lead{max-width:640px;margin:18px auto 0;color:var(--mut);font-size:clamp(15px,2.2vw,18px)}
+  .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .tag{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--teal);background:rgba(45,212,191,.1);
+    border:1px solid rgba(45,212,191,.3);border-radius:20px;padding:5px 12px}
+
+  /* зона установки */
+  .install{margin:38px auto 0;max-width:760px;text-align:center;
+    background:linear-gradient(180deg,rgba(26,28,33,.7),rgba(20,21,25,.5));
+    border:1px solid var(--line);border-radius:20px;padding:34px 26px;position:relative;overflow:hidden}
+  .install::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(60% 80% at 50% -10%,rgba(45,212,191,.12),transparent 60%)}
+  .hint-bar{font-size:12px;color:var(--mut);margin-bottom:22px}
+  .hint-bar b{color:var(--txt)}
+  .hint-bar kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);
+    border-radius:5px;padding:1px 7px;font-size:11px;color:var(--teal)}
+
+  /* кнопка-букмарклет */
+  .bm-btn{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:grab;user-select:none;
+    font-family:'Space Grotesk',system-ui,sans-serif;font-weight:800;font-size:20px;letter-spacing:.3px;color:#06120f;
+    background:linear-gradient(135deg,#2dd4bf,#3b8cff);border:none;border-radius:16px;padding:18px 38px;text-decoration:none;
+    box-shadow:0 10px 34px rgba(45,212,191,.32),0 0 0 1px rgba(255,255,255,.12) inset;transition:transform .15s,box-shadow .2s}
+  .bm-btn:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(45,212,191,.45)}
+  .bm-btn:active{cursor:grabbing;transform:translateY(-1px)}
+  .bm-btn.loading{filter:grayscale(.4) brightness(.8);cursor:wait}
+  .bm-btn::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;
+    box-shadow:0 0 0 0 rgba(45,212,191,.5);animation:ring 2.2s infinite}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(45,212,191,.45)}70%{box-shadow:0 0 0 16px rgba(45,212,191,0)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+  .drag-hint{margin-top:16px;font-size:13px;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:8px}
+  .drag-hint .arrow{font-size:18px;color:var(--teal);animation:bob 1.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .copy-btn{font-family:inherit;font-weight:700;font-size:13px;color:var(--txt);cursor:pointer;
+    background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 20px;transition:.15s}
+  .copy-btn:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px)}
+  .copy-btn.ok{background:var(--green);color:#06120f;border-color:var(--green)}
+  .warn{display:none;margin-top:18px;font-size:12px;color:var(--amber);background:rgba(245,177,61,.08);
+    border:1px solid rgba(245,177,61,.3);border-radius:10px;padding:10px 14px}
+
+  /* секции */
+  section.block{padding:60px 0 10px}
+  .sec-title{font-family:'Space Grotesk',system-ui,sans-serif;font-weight:800;font-size:clamp(24px,4vw,34px);
+    text-align:center;letter-spacing:.3px}
+  .sec-sub{text-align:center;color:var(--mut);margin-top:8px;font-size:14px}
+
+  /* шаги */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:34px}
+  .step{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:22px;position:relative;transition:.2s}
+  .step:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px)}
+  .step .n{position:absolute;top:-14px;left:18px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    font-weight:800;font-size:14px;color:#06120f;background:linear-gradient(135deg,#2dd4bf,#3b8cff)}
+  .step h3{font-size:15px;margin:6px 0 8px}
+  .step p{font-size:13px;color:var(--mut)}
+  .step kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:11px;color:var(--teal)}
+
+  /* фичи */
+  .feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:34px}
+  .feat{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.2s}
+  .feat:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .feat .ic{font-size:26px;margin-bottom:10px}
+  .feat h3{font-size:15px;margin-bottom:6px}
+  .feat p{font-size:13px;color:var(--mut)}
+
+  /* скрины */
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:34px}
+  .shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg1);transition:.2s}
+  .shot:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
+  .shot a{display:block}
+  .shot img{width:100%;display:block}
+  .shot .cap{padding:10px 14px;font-size:12px;color:var(--mut)}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);margin-top:70px;padding:28px 0;
+    text-align:center;color:var(--mut);font-size:13px}
+  footer a{color:var(--teal);text-decoration:none;font-weight:700}
+  footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="logo">ParserAccs</div>
+    <a class="gh" href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </header>
+
+  <div class="hero">
+    <h1>ParserAccs</h1>
+    <p class="lead">Букмарклет для массового парсинга кабинетов Facebook Ads Manager — баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений и привязка к BM в одной таблице с экспортом в CSV.</p>
+    <div class="tags">
+      <span class="tag">Graph API v20.0</span>
+      <span class="tag">Read-only</span>
+      <span class="tag">Без установки</span>
+      <span class="tag">CSV для Excel</span>
+    </div>
+  </div>
+
+  <div class="install">
+    <div class="hint-bar">Сначала покажи панель закладок: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)</div>
+
+    <a id="bm-link" class="bm-btn loading" href="javascript:void(0)" title="Перетащи меня на панель закладок">⏳ подготовка…</a>
+
+    <div class="drag-hint"><span class="arrow">↑</span> перетащи кнопку на панель закладок</div>
+
+    <div class="actions">
+      <button id="bm-copy" class="copy-btn">📋 Скопировать код</button>
+    </div>
+
+    <div id="warn" class="warn">⚠ Код букмарклета не подгрузился. Если открыл файл с диска — запусти локальный сервер или открой сайт на GitHub Pages. Либо скопируй код из <code>parseraccs.js</code> и создай закладку вручную.</div>
+  </div>
+
+  <section class="block">
+    <h2 class="sec-title">Как установить</h2>
+    <p class="sec-sub">Никаких расширений и установок — одна закладка</p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3>Покажи панель закладок</h3><p>Нажми <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>, чтобы сверху появилась полоса закладок.</p></div>
+      <div class="step"><span class="n">2</span><h3>Перетащи кнопку</h3><p>Зажми кнопку <b>ParserAccs</b> выше и брось её на панель закладок. На телефоне — нажми «Скопировать код» и создай закладку вручную.</p></div>
+      <div class="step"><span class="n">3</span><h3>Запусти в Ads Manager</h3><p>Открой Facebook Ads Manager и кликни по закладке. Готово — таблица кабинетов перед тобой.</p></div>
+    </div>
+  </section>
+
+  <section class="block">
+   
