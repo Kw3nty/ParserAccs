@@ -39,7 +39,7 @@
 - **Выделение** — кастомные чекбоксы с пружинным откликом; чекбокс в заголовке таблицы выделяет и снимает все видимые строки одним кликом. Выделение живёт между сменами фильтра, поиска и сортировки.
 - **Экспорт** — `📋 Copy IDs` и `⬇ CSV` работают по выделенным кабинетам, а если ничего не выделено — по всем видимым. CSV сразу разъезжается по столбцам в Excel (UTF‑8 BOM + подсказка `sep=,`).
 - **Обновление без закрытия** — кнопка `↻` в шапке пересобирает все данные оверлеем поверх модалки, сохраняя выделение, фильтр и сортировку.
-- **Прямые ссылки** на каждый кабинет ведут ровно в него — без параметра `business_id`, который раньше вызывал редирект на чужой кабинет.
+- **Прямые ссылки** на каждый кабинет ведут ровно в него.
 
 ### Колонки CSV
 
@@ -165,7 +165,7 @@ Read‑only, via the official Graph API — nothing in your accounts is changed.
 - **Selection** — custom checkboxes with a springy response; the header checkbox selects and clears all visible rows in one click. Selection survives filter, search and sort changes.
 - **Export** — `📋 Copy IDs` and `⬇ CSV` act on the selected accounts, or on all visible ones when nothing is selected. The CSV splits into columns in Excel on open (UTF‑8 BOM + the `sep=,` hint).
 - **Refresh without closing** — the `↻` button in the header reloads all data via an overlay on top of the modal, keeping your selection, filter and sort.
-- **Direct links** open each account exactly — without the `business_id` parameter that used to redirect to a different account.
+- **Direct links** open each account exactly.
 
 ### ⚙️ The AutoRules tab
 
