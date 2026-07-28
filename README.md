@@ -1,164 +1,210 @@
 <a id="top"></a>
-<div align="center">
 
-# ParserAccs
+**🇷🇺 Русский** · [🇬🇧 English](#english)
 
-**🇷🇺 Русский** | [🇬🇧 English](#english)
+![Facebook Graph API](https://img.shields.io/badge/Graph%20API-v20.0-1877F2?logo=facebook&logoColor=white)
+![Type](https://img.shields.io/badge/type-bookmarklet-2dd4bf?logo=javascript&logoColor=06120f)
+![i18n](https://img.shields.io/badge/i18n-RU%20%7C%20EN-a78bfa)
+![License](https://img.shields.io/badge/license-MIT-37d67a)
 
-![Graph API](https://img.shields.io/badge/Facebook%20Graph%20API-v20.0-1877F2?logo=facebook)
-![Type](https://img.shields.io/badge/type-bookmarklet-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
+<img src="preview.jpg" width="49%" alt="ParserAccs — сводка по кабинетам"> <img src="recount.png" width="49%" alt="ParserAccs — оверлей пересчёта трат">
 
-<img src="preview.jpg" width="49%" alt="ParserAccs — главное окно"> <img src="recount.png" width="49%" alt="ParserAccs — оверлей пересчёта">
+**ParserAccs** — букмарклет, который читает все рекламные кабинеты Facebook Ads Manager пачкой и складывает их в одну живую таблицу: баланс, траты за любой период, дневные лимиты, пороги биллинга, статусы объявлений и привязку к Business Manager. А вторая вкладка переносит автоправила между кабинетами — с пересчётом денежных порогов под валюту каждой цели.
 
-</div>
+Ничего не устанавливается. Одна закладка — и инструмент ваш.
 
-<a id="russian"></a>
-## 🇷🇺 Русский
+---
 
-> Букмарклет для массового парсинга рекламных кабинетов **Facebook Ads Manager**: баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений и привязка к Business Manager — всё в одной таблице с экспортом в CSV.
+## ⚡ Установка за 10 секунд
 
-### ✨ Возможности
+1. Откройте лендинг: **[parseraccs.is-a.dev](https://parseraccs.is-a.dev)** (или `kw3nty.github.io/ParserAccs`).
+2. Покажите панель закладок браузера — `Ctrl+Shift+B` (Mac: `⌘+Shift+B`).
+3. **Перетащите** бирюзовую кнопку `📌 ParserAccs` с лендинга на панель закладок. Готово.
+4. Откройте Ads Manager → кликните по закладке.
 
-- 📊 **Полная сводка по кабинетам**: ID, имя, статус, баланс, валюта, траты за всё время и за выбранный период, дневной лимит, порог биллинга, счётчики активных/отклонённых объявлений, привязка к BM.
-- 📅 **Гибкие периоды**: Today, Yesterday, 7 / 14 / 30 дней, This month, Last month, Lifetime + произвольный диапазон дат. Популярные периоды берутся из кэша мгновенно, остальные считаются на лету с живым прогрессом.
-- 🔍 **Фильтры и поиск**: Все / Активные / Неактивные + поиск по ID, имени кабинета и имени/ID BM. Сортировка кликом по любой колонке.
-- ☑️ **Выделение кабинетов** чекбоксами (поодиночке или все видимые) → **Copy IDs** и **Export CSV** по выбранным.
-- 📄 **CSV для Excel**: корректная кириллица (BOM) и разделитель `sep=,` — файл сразу разъезжается по столбцам.
-- 🎨 **Живой интерфейс**: тёмная тема, анимация частиц на фоне окна, градиентный заголовок, оверлей пересчёта поверх таблицы.
-- 🔗 **Прямые ссылки** на каждый кабинет в Ads Manager (без редиректов).
-- 🔒 **Read-only**: скрипт только *читает* данные через Graph API, ничего не изменяет в кабинетах.
+> На телефоне или если drag не сработал — на лендинге есть кнопка **«Скопировать код»**: создайте закладку вручную и вставьте код в поле адреса.
+> Тумблер **RU / EN** на лендинге задаёт язык *устанавливаемой* закладки — перетащите кнопку в нужном положении. Внутри парсера язык переключается кнопкой **🌐** в шапке и запоминается.
 
-### 🧩 Установка
+При обновлении скрипта создавайте закладку заново (или полностью заменяйте её URL) — правки длинного `javascript:`‑кода некоторые браузеры молча не сохраняют.
 
-Это букмарклет — закладка, в которой вместо адреса лежит JavaScript-код.
+---
 
-1. Скопируйте содержимое файла `parseraccs.js` целиком.
-2. Создайте новую закладку в браузере:
-   - **Chrome / Edge**: ПКМ по панели закладок → *Добавить страницу…* → в поле **URL** вставьте скопированный код → сохраните.
-   - **Firefox**: ПКМ по панели закладок → *Новая закладка…* → вставьте код в поле **Адрес**.
-3. Откройте `business.facebook.com` или Ads Manager и нажмите на закладку.
+## 📊 Вкладка «Кабинеты»
 
-> ⚠️ При обновлении скрипта создавайте **новую** закладку (или полностью заменяйте URL старой) — редактирование длинного `javascript:`-кода некоторые браузеры молча не сохраняют.
+Парсинг идёт через официальный Graph API и только читает данные — в кабинетах ничего не меняется.
 
-### 🔑 Токен доступа
+- **Сводка в одну таблицу** — ID, имя, статус, баланс с валютой, траты за всё время и за выбранный период, дневной лимит (`∞`, если без лимита), порог биллинга, счётчики активных и отклонённых объявлений, привязанный BM.
+- **Периоды** — Today · Yesterday · 7 / 14 / 30 дней · This month · Last month · Lifetime и произвольный диапазон дат. Популярные периоды берутся из кэша мгновенно; «тяжёлые» считаются на лету — при этом всплывает оверлей пересчёта *поверх* окна, а таблица остаётся на месте.
+- **Фильтры и поиск** — Все / Активные / Неактивные плюс поиск по ID, имени кабинета и имени или ID BM. Сортировка — кликом по любой колонке.
+- **Выделение** — кастомные чекбоксы с пружинным откликом; чекбокс в заголовке таблицы выделяет и снимает все видимые строки одним кликом. Выделение живёт между сменами фильтра, поиска и сортировки.
+- **Экспорт** — `📋 Copy IDs` и `⬇ CSV` работают по выделенным кабинетам, а если ничего не выделено — по всем видимым. CSV сразу разъезжается по столбцам в Excel (UTF‑8 BOM + подсказка `sep=,`).
+- **Обновление без закрытия** — кнопка `↻` в шапке пересобирает все данные оверлеем поверх модалки, сохраняя выделение, фильтр и сортировку.
+- **Прямые ссылки** на каждый кабинет ведут ровно в него — без параметра `business_id`, который раньше вызывал редирект на чужой кабинет.
 
-Скрипт пытается подхватить токен автоматически из открытой страницы Ads Manager. Если не получилось — попросит ввести токен вручную (`EAAB...`), его можно взять, например, из FBhelper. Токен используется только для запросов к Graph API от вашего имени.
+### Колонки CSV
 
-### 🚀 Использование
-
-1. Запустите закладку в Ads Manager → дождитесь загрузки кабинетов (появится оверлей с прогрессом).
-2. Отфильтруйте список и/или выберите период — траты пересчитаются (для «тяжёлых» периодов всплывёт оверлей «Пересчёт трат…»).
-3. Отметьте нужные кабинеты чекбоксами (или чекбоксом в заголовке — все видимые).
-4. Нажмите **⬇ CSV** (выгрузка) или **📋 Copy IDs** (копирование ID). Без выделения обе кнопки работают по всем видимым кабинетам.
-
-#### Колонки CSV
-
-| Колонка | Описание |
+| Колонка | Значение |
 |---|---|
 | `ID` | ID рекламного кабинета |
 | `Name` | Название кабинета |
-| `Status` | Статус (Active / Disabled / Unsettled / …) |
+| `Status` | Active / Disabled / Unsettled / Review / Pending / Grace / … |
 | `Balance` / `Currency` | Баланс и валюта |
 | `Spend Life` | Траты за всё время |
 | `Spend Period` / `Period` | Траты за выбранный период и его название |
 | `Limit` | Дневной лимит (`INF`, если без лимита) |
 | `Billing` | Порог биллинга |
-| `Ads OK` / `Ads No` | Кол-во активных / отклонённых объявлений |
+| `Ads OK` / `Ads No` | Активные и отклонённые объявления |
 | `BM Name` / `BM ID` | Привязанный Business Manager |
-
-### ❓ FAQ
-
-**Ссылка на кабинет редиректит на другой кабинет.**
-Обновитесь до актуальной версии — ссылки формируются в прямом формате `https://www.facebook.com/adsmanager/manage/campaigns?act=<число>` без параметра `business_id`, который и вызывал редирект.
-
-**CSV открывается в Excel одной колонкой.**
-В актуальной версии в начало файла пишется `sep=,` — Excel сам разбивает столбцы. Если у вас старая версия — обновите закладку.
-
-**Поиск не находит кабинет по букве.**
-Проверьте раскладку: имена и BM обычно в латинице, а русская «В» и латинская `B` — разные символы.
-
-**Это безопасно?**
-Скрипт выполняет только GET-запросы к официальному Graph API (чтение), обрабатывает данные локально в браузере и ничего не отправляет на сторонние серверы. Тем не менее вы используете его на свой риск и со своим токеном.
-
-[🇬🇧 English ↓](#english) · [⬆ Наверх](#top)
 
 ---
 
-<a id="english"></a>
-## 🇬🇧 English
+## ⚙️ Вкладка «AutoRules»
 
-> A bookmarklet for bulk parsing of **Facebook Ads Manager** accounts: balance, spend for any period, daily limits, billing, ad status and Business Manager mapping — all in one table with CSV export.
+Менеджер автоправил: экспорт из кабинета‑донора и импорт в выбранные цели — по логике Ad Rules Engine Meta. В отличие от парсера, здесь идёт **запись** в кабинеты (создание, удаление и смена статуса правил), поэтому на все деструктивные действия стоит подтверждение. Сами рекламные кампании правила не запускают — они лишь управляют существующими объектами по заданным условиям.
 
-### ✨ Features
+- **Донор** — поиск кабинета‑источника по ID / имени / BM и кнопка `📥 Экспорт правил`. Рядом с каждым кабинетом в списках подгружаются счётчики правил `✓N ⏸M` (включено / выключено).
+- **Правила донора** — список с чекбоксами: отмечаете, какие правила переносить.
+- **Целевые кабинеты** — поиск, фильтр Все / Активные / Неактивные, чекбокс‑заголовок «выделить / снять все видимые» и счётчики правил у каждой цели.
+- **Импорт** — `🚀 Импортировать` создаёт выбранные правила во всех отмеченных целях через `POST /act_{id}/adrules_library`.
+- **Конвертация валют** — денежные пороги в условиях (`spent`, `cost_per_*`, CPA/CPC/CPM и т. п.) пересчитываются под валюту каждой цели через USD как промежуточную, с учётом «центовых» оффсетов валют. ROAS, CTR и охваты не трогаются.
 
-- 📊 **Full account overview**: ID, name, status, balance, currency, lifetime and period spend, daily limit, billing threshold, active/disapproved ad counters, BM mapping.
-- 📅 **Flexible periods**: Today, Yesterday, 7 / 14 / 30 days, This month, Last month, Lifetime + a custom date range. Popular periods are instant from cache; the rest are computed on the fly with a live progress overlay.
-- 🔍 **Filters & search**: All / Active / Disabled + search by ID, account name and BM name/ID. Click any column to sort.
-- ☑️ **Select accounts** with checkboxes (one by one or all visible) → **Copy IDs** and **Export CSV** for the selected ones.
-- 📄 **Excel-ready CSV**: proper Cyrillic (BOM) and the `sep=,` hint — the file splits into columns on open.
-- 🎨 **Living UI**: dark theme, particle animation behind the window, gradient title, recompute overlay on top of the table.
-- 🔗 **Direct links** to each account in Ads Manager (no redirects).
-- 🔒 **Read-only**: the script only *reads* data via the Graph API and changes nothing in your accounts.
+    | Валюта | Оффсет | Примеры |
+    |---|---|---|
+    | `1` | без центов | JPY, KRW, VND, CLP, COP, HUF, ISK, IDR |
+    | `100` | стандарт | USD, EUR, RUB, UAH, TRY, GBP, … |
+    | `1000` | три знака | BHD, KWD, OMR, JOD, TND |
 
-### 🧩 Install
+- **Опции импорта** — конвертировать пороги (вкл. по умолчанию), удалить существующие правила в целях перед импортом, импортировать как PAUSED (не включать).
+- **Массовые действия** — `▶ Включить все`, `⏸ Выключить все`, `🗑 Удалить все` по выбранным целям.
+- **JSON‑перенос** — `💾 В JSON` сохраняет отмеченные правила в файл (в USD‑базе, без ID донора), `📂 Из JSON` загружает их обратно. Файл валютонезависим: правила от донора в RUB, загруженные в цель в USD или TRY, пересчитаются корректно. Так правила переносятся между разными токенами и браузерами.
+- **Таймзоны** — часы расписания `SCHEDULED` намеренно *не* сдвигаются под цель (фиксированный сдвиг ломается из‑за перехода на летнее время), а разница поясов донора и цели показывается в логе как ориентир для ручной проверки.
+- **Цветной лог** — каждая операция раскрашена по типу (создание, ошибка, разделитель кабинета, предупреждение, итог) и въезжает с микро‑анимацией.
 
-This is a bookmarklet — a bookmark whose URL is a piece of JavaScript code.
+<!-- Если зальёте скрин вкладки AutoRules как auto-rules.png, раскомментируйте строку ниже, чтобы показать его в README:
+<img src="auto-rules.png" width="70%" alt="ParserAccs — вкладка AutoRules">
+-->
 
-1. Copy the entire contents of `parseraccs.js`.
-2. Create a new bookmark in your browser:
-   - **Chrome / Edge**: right-click the bookmarks bar → *Add page…* → paste the code into the **URL** field → save.
-   - **Firefox**: right-click the bookmarks bar → *New Bookmark…* → paste the code into the **Location** field.
-3. Open `business.facebook.com` or Ads Manager and click the bookmark.
+---
 
-> ⚠️ When updating the script, create a **new** bookmark (or fully replace the old URL) — some browsers silently fail to save edits to long `javascript:` code.
+## 🌐 Языки и лендинг
 
-### 🔑 Access token
+Интерфейс полностью двуязычный — **RU и EN**.
 
-The script tries to pick up the token automatically from the open Ads Manager page. If it can't, it will ask you to paste a token manually (`EAAB...`) — you can grab one from FBhelper, for example. The token is used only for Graph API requests on your behalf.
+- Дефолтный язык берётся из настроек браузера (`navigator.language`), а не по IP — это важно для арбитражников за прокси, где геолокация всегда US.
+- Тумблер **RU / EN** на лендинге определяет язык *закладки*, которую вы перетаскиваете.
+- Кнопка **🌐** в шапке парсера меняет язык на лету, без потери загруженных данных, и пишет выбор в `localStorage`.
+- Лендинг — одностраничник на GitHub Pages с фоновой анимацией частиц, секциями «как установить / что умеет / скрины» и кнопкой‑букмарклетом для drag&drop. Хостинг бесплатный, адрес — `parseraccs.is-a.dev` (зеркало `kw3nty.github.io/ParserAccs`).
 
-### 🚀 Usage
+---
 
-1. Run the bookmark in Ads Manager → wait for the accounts to load (a progress overlay appears).
-2. Filter the list and/or pick a period — spend will be recomputed (a "Recomputing spend…" overlay pops up for heavy periods).
-3. Tick the accounts you need (or the header checkbox for all visible).
-4. Click **⬇ CSV** (export) or **📋 Copy IDs**. With nothing selected, both buttons work on all visible accounts.
+## ❓ Частые вопросы
 
-#### CSV columns
+**Ссылка на кабинет ведёт не туда.** Обновите закладку — ссылки теперь в прямом формате `…/campaigns?act=<число>` без `business_id`, который и вызывал редирект.
 
-| Column | Description |
-|---|---|
-| `ID` | Ad account ID |
-| `Name` | Account name |
-| `Status` | Status (Active / Disabled / Unsettled / …) |
-| `Balance` / `Currency` | Balance and currency |
-| `Spend Life` | Lifetime spend |
-| `Spend Period` / `Period` | Spend for the selected period and its label |
-| `Limit` | Daily limit (`INF` if unlimited) |
-| `Billing` | Billing threshold |
-| `Ads OK` / `Ads No` | Active / disapproved ad counts |
-| `BM Name` / `BM ID` | Linked Business Manager |
+**CSV открывается в Excel одной колонкой.** В актуальной версии в начало файла пишется `sep=,` — Excel сам разбивает столбцы. На старой закладке — обновите её.
 
-### ❓ FAQ
+**Поиск не находит кабинет по букве.** Проверьте раскладку: имена и BM обычно в латиннице, а русская «В» и латинская `B` — разные символы.
 
-**Account link redirects to a different account.**
-Update to the latest version — links now use the direct format `https://www.facebook.com/adsmanager/manage/campaigns?act=<number>` without the `business_id` parameter that caused the redirect.
+**При импорте правил ошибка про PAUSE и стоимость.** Это ограничение самого Facebook: правило с действием PAUSE не может иметь условий по стоимости. Такое правило нужно поправить в доноре — лог покажет точное сообщение Meta по каждому правилу.
 
-**CSV opens as a single column in Excel.**
-The current version writes `sep=,` at the top of the file — Excel splits the columns itself. If you're on an old version, update the bookmark.
+**Это безопасно?** Парсер делает только GET‑запросы к официальному Graph API и обрабатывает данные локально в браузере, ничего не отправляя на сторонние серверы. Вкладка AutoRules пишет правила в *ваши* кабинеты через *ваш* токен — и всегда с подтверждением. Вы используете инструмент на свой риск.
 
-**Search doesn't find an account by a letter.**
-Check your keyboard layout: names and BMs are usually in Latin script, and the Cyrillic "В" and Latin `B` are different characters.
+---
 
-**Is it safe?**
-The script makes only GET requests to the official Graph API (read-only), processes data locally in the browser and sends nothing to third-party servers. Still, you use it at your own risk and with your own token.
+## 📁 Структура репозитория
 
-[🇷🇺 Русский ↑](#russian) · [⬆ Top](#top)
+- `parseraccs.js` — код букмарклета (один файл, одна точка поддержки; лендинг подтягивает его сам).
+- `index.html` — лендинг на GitHub Pages.
+- `README.md` — этот файл.
+- `LICENSE` — MIT.
+- `preview.jpg`, `recount.png` — скрины интерфейса.
+
+---
+
+## 🛠 Токен доступа
+
+Скрипт подхватывает токен автоматически из открытой страницы Ads Manager. Если не получилось — попросит ввести его вручную (`EAAB…`); токен используется только для запросов к Graph API от вашего имени и никуда не передаётся.
 
 ---
 
 <div align="center">
 
-🇷🇺 Сделал [Kwenty](https://t.me/kw33nty) · 🇬🇧 Built by [Kwenty](https://t.me/kw33nty) · [GitHub](https://github.com/Kw3nty/ParserAccs) · MIT
+🇷🇺 Сделал [Kwenty](https://t.me/kw33nty) · 🇬 Built by [Kwenty](https://t.me/kw33nty) · [GitHub](https://github.com/Kw3nty/ParserAccs) · MIT
+
+[🇬 English ↓](#english) · [⬆ Наверх](#top)
+
+</div>
+
+---
+---
+
+<a id="english"></a>
+
+**[🇷🇺 Русский](#top)** · **🇬🇧 English**
+
+**ParserAccs** is a bookmarklet that reads every Facebook Ads Manager account in bulk and lays them out in one living table — balance, spend for any period, daily limits, billing thresholds, ad status and Business Manager mapping. A second tab moves automated rules between accounts, converting money thresholds into each target's currency.
+
+No install. One bookmark and it's yours.
+
+### ⚡ Install in 10 seconds
+
+1. Open the landing page: **[parseraccs.is-a.dev](https://parseraccs.is-a.dev)** (or `kw3nty.github.io/ParserAccs`).
+2. Show the bookmarks bar — `Ctrl+Shift+B` (Mac: `⌘+Shift+B`).
+3. **Drag** the teal `📌 ParserAccs` button onto the bookmarks bar. Done.
+4. Open Ads Manager and click the bookmark.
+
+> On mobile, or if drag fails, use the **“Copy code”** button on the landing page and paste the code into a new bookmark's URL field.
+> The **RU / EN** toggle on the landing page sets the language of the *bookmark you install* — drag the button while the toggle is in the position you want. Inside the parser, the **🌐** button switches language on the fly and remembers it.
+
+When updating the script, create the bookmark anew (or fully replace its URL) — some browsers silently fail to save edits to long `javascript:` code.
+
+### 📊 The Accounts tab
+
+Read‑only, via the official Graph API — nothing in your accounts is changed.
+
+- **One table for everything** — ID, name, status, balance with currency, lifetime and period spend, daily limit (`∞` if unlimited), billing threshold, active and disapproved ad counts, linked BM.
+- **Periods** — Today · Yesterday · 7 / 14 / 30 days · This month · Last month · Lifetime and a custom date range. Popular periods are instant from cache; heavier ones recompute on the fly behind an overlay that floats *over* the window while the table stays put.
+- **Filters & search** — All / Active / Disabled plus search by ID, account name and BM name or ID. Click any column to sort.
+- **Selection** — custom checkboxes with a springy response; the header checkbox selects and clears all visible rows in one click. Selection survives filter, search and sort changes.
+- **Export** — `📋 Copy IDs` and `⬇ CSV` act on the selected accounts, or on all visible ones when nothing is selected. The CSV splits into columns in Excel on open (UTF‑8 BOM + the `sep=,` hint).
+- **Refresh without closing** — the `↻` button in the header reloads all data via an overlay on top of the modal, keeping your selection, filter and sort.
+- **Direct links** open each account exactly — without the `business_id` parameter that used to redirect to a different account.
+
+### ⚙️ The AutoRules tab
+
+A rules manager: export from a donor account and import into chosen targets, following Meta's Ad Rules Engine. Unlike the parser, this tab *writes* to accounts (create, delete and toggle rules), so every destructive action asks for confirmation. The rules themselves don't launch campaigns — they only act on existing objects by the conditions you set.
+
+- **Donor** — search the source account by ID / name / BM, then `📥 Export rules`. Each account in the lists shows a live rule counter `✓N ⏸M` (enabled / disabled).
+- **Donor rules** — a checklist of which rules to carry over.
+- **Target accounts** — search, an All / Active / Disabled filter, a header checkbox to select or clear all visible targets, and per‑target rule counters.
+- **Import** — `🚀 Import` creates the chosen rules in every ticked target via `POST /act_{id}/adrules_library`.
+- **Currency conversion** — money thresholds in conditions (`spent`, `cost_per_*`, CPA/CPC/CPM, …) are reconverted into each target's currency through USD as the pivot, respecting each currency's cent offset. ROAS, CTR and reach metrics are left untouched.
+- **Import options** — convert thresholds (on by default), delete existing rules in targets before import, import as PAUSED.
+- **Bulk actions** — `▶ Enable all`, `⏸ Disable all`, `🗑 Delete all` across the selected targets.
+- **JSON transfer** — `💾 To JSON` saves the ticked rules to a file (in a USD base, without the donor's IDs); `📂 From JSON` loads them back. The file is currency‑agnostic, so rules exported from a RUB donor and loaded into a USD or TRY target reconvert correctly. This is how rules travel between different tokens and browsers.
+- **Time zones** — `SCHEDULED` hours are intentionally *not* shifted to the target (a fixed offset breaks across daylight‑saving transitions); the donor/target zone delta is printed in the log as a hint for a manual check.
+- **Coloured log** — every operation is tinted by type (created, error, account separator, warning, summary) and slides in with a small animation.
+
+### 🌐 Languages & landing page
+
+The UI is fully bilingual — **RU and EN**. The default follows the browser language (`navigator.language`), not the IP — which matters behind proxies where geo always reads US. The landing‑page toggle sets the language of the bookmark you drag; the **🌐** button inside the parser switches on the fly and persists to `localStorage`. The landing page itself is a single‑page site on GitHub Pages with a particle background, install / features / screenshots sections and a drag‑and‑drop bookmarklet button, served for free at `parseraccs.is-a.dev` (mirror `kw3nty.github.io/ParserAccs`).
+
+### ❓ FAQ
+
+**Account link goes to the wrong place.** Update the bookmark — links now use the direct `…/campaigns?act=<number>` format without `business_id`, which caused the redirect.
+
+**CSV opens as one column in Excel.** The current version writes `sep=,` at the top so Excel splits the columns. On an old bookmark, update it.
+
+**Search misses an account by a letter.** Check your keyboard layout — names and BMs are usually Latin, and Cyrillic “В” and Latin `B` are different characters.
+
+**Rule import complains about PAUSE and cost.** That's Facebook's own rule: a PAUSE action can't carry cost conditions. Fix that rule in the donor — the log shows Meta's exact message per rule.
+
+**Is it safe?** The parser makes only GET requests to the official Graph API and processes data locally in the browser, sending nothing to third parties. The AutoRules tab writes rules into *your* accounts with *your* token — and always with a confirmation. You use the tool at your own risk.
+
+<div align="center">
+
+🇷🇺 Built by [Kwenty](https://t.me/kw33nty) · 🇬🇧 Built by [Kwenty](https://t.me/kw33nty) · [GitHub](https://github.com/Kw3nty/ParserAccs) · MIT
+
+[🇷🇺 Русский ↑](#top) · [⬆ Top](#top)
 
 </div>
