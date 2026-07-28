@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ParserAccs — Facebook Ads parser bookmarklet</title>
-<meta name="description" content="Bookmarklet for bulk parsing of Facebook Ads Manager accounts: balance, spend by period, limits, billing, ad status, BM mapping and CSV export.">
+<meta name="description" content="Bookmarklet for bulk parsing of Facebook Ads Manager accounts and cross-account automated-rules transfer: balance, spend by period, limits, billing, ad status, BM mapping, CSV export and AutoRules with currency conversion.">
 <meta name="theme-color" content="#0b0d11">
 <style>
   :root{
@@ -32,7 +32,6 @@
     border:1px solid var(--line);border-radius:20px;padding:7px 14px;transition:.18s}
   .gh:hover{color:var(--teal);border-color:var(--teal);transform:translateY(-1px)}
 
-  /* тумблер языка */
   .langsw{position:relative;display:inline-flex;align-items:center;background:var(--bg2);border:1px solid var(--line);
     border-radius:20px;padding:3px;cursor:pointer;user-select:none;font-family:ui-monospace,monospace}
   .langsw .opt{position:relative;z-index:2;font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--mut);
@@ -51,7 +50,7 @@
     animation:tshift 7s linear infinite,tglow 3.6s ease-in-out infinite}
   @keyframes tshift{0%{background-position:0% 50%}100%{background-position:220% 50%}}
   @keyframes tglow{0%,100%{filter:drop-shadow(0 0 0 rgba(45,212,191,0))}50%{filter:drop-shadow(0 0 26px rgba(45,212,191,.35))}}
-  .hero p.lead{max-width:640px;margin:18px auto 0;color:var(--mut);font-size:clamp(15px,2.2vw,18px)}
+  .hero p.lead{max-width:680px;margin:18px auto 0;color:var(--mut);font-size:clamp(15px,2.2vw,18px)}
   .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
   .tag{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--teal);background:rgba(45,212,191,.1);
     border:1px solid rgba(45,212,191,.3);border-radius:20px;padding:5px 12px}
@@ -111,6 +110,11 @@
   .feat .ic{font-size:26px;margin-bottom:10px}
   .feat h3{font-size:15px;margin-bottom:6px}
   .feat p{font-size:13px;color:var(--mut)}
+  .feat.rules{border-color:rgba(167,139,250,.3)}
+  .feat.rules:hover{border-color:rgba(167,139,250,.55);box-shadow:0 10px 30px rgba(167,139,250,.12)}
+
+  .rules-note{max-width:760px;margin:26px auto 0;font-size:12px;color:var(--amber);background:rgba(245,177,61,.07);
+    border:1px solid rgba(245,177,61,.28);border-radius:12px;padding:12px 16px;line-height:1.6;text-align:center}
 
   .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:34px}
   .shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg1);transition:.2s}
@@ -152,6 +156,7 @@
       <span class="tag" data-i18n="tag2"></span>
       <span class="tag" data-i18n="tag3"></span>
       <span class="tag" data-i18n="tag4"></span>
+      <span class="tag" data-i18n="tag5"></span>
     </div>
   </div>
 
@@ -189,7 +194,20 @@
       <div class="feat"><div class="ic">☑️</div><h3 data-i18n="f4t"></h3><p data-i18n="f4p"></p></div>
       <div class="feat"><div class="ic">📄</div><h3 data-i18n="f5t"></h3><p data-i18n="f5p"></p></div>
       <div class="feat"><div class="ic">🔒</div><h3 data-i18n="f6t"></h3><p data-i18n="f6p"></p></div>
+      <div class="feat rules"><div class="ic">🔁</div><h3 data-i18n="f7t"></h3><p data-i18n="f7p"></p></div>
+      <div class="feat rules"><div class="ic">💱</div><h3 data-i18n="f8t"></h3><p data-i18n="f8p"></p></div>
     </div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec-title" data-i18n="rules_t"></h2>
+    <p class="sec-sub" data-i18n="rules_s"></p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3 data-i18n="r1t"></h3><p data-i18n="r1p"></p></div>
+      <div class="step"><span class="n">2</span><h3 data-i18n="r2t"></h3><p data-i18n="r2p"></p></div>
+      <div class="step"><span class="n">3</span><h3 data-i18n="r3t"></h3><p data-i18n="r3p"></p></div>
+    </div>
+    <div class="rules-note" data-i18n="rules_note"></div>
   </section>
 
   <section class="block">
@@ -226,8 +244,8 @@ try{(function(){
 /* ===== словари лендинга ===== */
 var D={
 ru:{
- lead:'Букмарклет для массового парсинга кабинетов Facebook Ads Manager — баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений и привязка к BM в одной таблице с экспортом в CSV.',
- tag1:'Graph API v20.0',tag2:'Read-only',tag3:'Без установки',tag4:'CSV для Excel',
+ lead:'Букмарклет для массового парсинга кабинетов Facebook Ads Manager и переноса автоправил между кабинетами — баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений, привязка к BM, экспорт в CSV и AutoRules с конвертацией валют.',
+ tag1:'Graph API v20.0',tag2:'Read-only парсер',tag3:'Без установки',tag4:'CSV для Excel',tag5:'⚙️ Автоправила',
  hint:'Сначала покажи панель закладок: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)',
  drag:'перетащи кнопку на панель закладок',
  langnote:'Язык интерфейса парсера задаётся здесь: перетащенная закладка откроется на <b>выбранном языке</b>. По умолчанию — язык твоего браузера (прокси не влияют).',
@@ -236,21 +254,28 @@ ru:{
  how_t:'Как установить',how_s:'Никаких расширений и установок — одна закладка',
  s1t:'Покажи панель закладок',s1p:'Нажми <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>, чтобы сверху появилась полоса закладок.',
  s2t:'Перетащи кнопку',s2p:'Зажми кнопку ParserAccs выше и брось её на панель закладок. На телефоне — «Скопировать код» и создай закладку вручную.',
- s3t:'Запусти в Ads Manager',s3p:'Открой Facebook Ads Manager и кликни по закладке. Готово — таблица кабинетов перед тобой.',
+ s3t:'Запусти в Ads Manager',s3p:'Открой Facebook Ads Manager и кликни по закладке. Готово — таблица кабинетов и вкладка AutoRules перед тобой.',
  feat_t:'Что умеет',
  f1t:'Полная сводка',f1p:'ID, имя, статус, баланс, валюта, траты за всё время и за период, лимит, биллинг, активные и отклонённые объявления, BM.',
  f2t:'Любой период',f2p:'Today, Yesterday, 7/14/30 дней, месяц, Lifetime и свои даты. Популярные периоды — мгновенно из кэша.',
  f3t:'Фильтры и поиск',f3p:'Все / Активные / Неактивные, поиск по ID, имени и BM, сортировка по любой колонке.',
  f4t:'Выделение',f4p:'Отмечай кабинеты чекбоксами и копируй ID или выгружай CSV только по выбранным.',
  f5t:'CSV для Excel',f5p:'Кириллица и разделитель sep=, — файл сразу разъезжается по столбцам.',
- f6t:'Read-only',f6p:'Только чтение через официальный Graph API. Скрипт ничего не меняет в кабинетах.',
+ f6t:'Read-only парсер',f6p:'Вкладка кабинетов только читает через официальный Graph API и ничего не меняет.',
+ f7t:'Перенос автоправил',f7p:'Вкладка AutoRules: экспорт правил из кабинета‑донора и импорт в выбранные цели пачкой, с массовым включением, выключением и удалением.',
+ f8t:'Валюты и JSON',f8p:'Денежные пороги правил пересчитываются под валюту каждой цели; правила сохраняются в JSON‑файл и грузятся обратно — перенос между токенами и браузерами.',
+ rules_t:'⚙️ AutoRules',rules_s:'Перенос автоправил между кабинетами за три шага',
+ r1t:'Экспорт из донора',r1p:'Выбери кабинет‑источник и нажми «Экспорт правил». Отметь галочками, какие правила переносить.',
+ r2t:'Выбери цели',r2p:'Отметь целевые кабинеты (фильтр актив/неактив + поиск). Оставь включённой конвертацию порогов под валюту цели.',
+ r3t:'Импортируй',r3p:'Жми «Импортировать» — правила создадутся во всех целях. Для переноса между браузерами/токенами используй «В JSON» и «Из JSON».',
+ rules_note:'⚠ В отличие от парсера, AutoRules <b>пишет</b> в кабинеты (создание, удаление и смена статуса правил) — поэтому на импорт и массовые действия стоит подтверждение. Сами рекламные кампании правила не запускают.',
  look_t:'Как выглядит',
  cap1:'Сводка по кабинетам, фильтры и периоды',cap2:'Оверлей пересчёта трат по периоду',
  footer:'Сделал <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Исходники на <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · Лицензия MIT'
 },
 en:{
- lead:'A bookmarklet for bulk parsing of Facebook Ads Manager accounts — balance, spend for any period, daily limits, billing threshold, ad status and BM mapping in one table with CSV export.',
- tag1:'Graph API v20.0',tag2:'Read-only',tag3:'No install',tag4:'Excel-ready CSV',
+ lead:'A bookmarklet for bulk parsing of Facebook Ads Manager accounts and cross-account automated-rules transfer — balance, spend for any period, daily limits, billing threshold, ad status, BM mapping, CSV export and AutoRules with currency conversion.',
+ tag1:'Graph API v20.0',tag2:'Read-only parser',tag3:'No install',tag4:'Excel-ready CSV',tag5:'⚙️ Auto rules',
  hint:'First show the bookmarks bar: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)',
  drag:'drag the button onto your bookmarks bar',
  langnote:'The parser UI language is set here: the installed bookmark opens in the <b>selected language</b>. Default = your browser language (proxies don\'t affect it).',
@@ -259,14 +284,21 @@ en:{
  how_t:'How to install',how_s:'No extensions, no setup — a single bookmark',
  s1t:'Show the bookmarks bar',s1p:'Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> so the bookmarks bar appears on top.',
  s2t:'Drag the button',s2p:'Grab the ParserAccs button above and drop it on the bookmarks bar. On mobile — copy the code and create a bookmark manually.',
- s3t:'Run it in Ads Manager',s3p:'Open Facebook Ads Manager and click the bookmark. Done — the accounts table is yours.',
+ s3t:'Run it in Ads Manager',s3p:'Open Facebook Ads Manager and click the bookmark. Done — the accounts table and the AutoRules tab are yours.',
  feat_t:'What it does',
  f1t:'Full overview',f1p:'ID, name, status, balance, currency, lifetime and period spend, limit, billing, active and disapproved ads, BM.',
  f2t:'Any period',f2p:'Today, Yesterday, 7/14/30 days, month, Lifetime and custom dates. Popular periods are instant from cache.',
  f3t:'Filters & search',f3p:'All / Active / Disabled, search by ID, name and BM, sort by any column.',
  f4t:'Selection',f4p:'Tick accounts with checkboxes and copy IDs or export CSV for the selected ones only.',
  f5t:'Excel-ready CSV',f5p:'UTF-8 BOM and the sep=, hint — the file splits into columns on open.',
- f6t:'Read-only',f6p:'Reads only, via the official Graph API. The script changes nothing in your accounts.',
+ f6t:'Read-only parser',f6p:'The accounts tab only reads via the official Graph API and changes nothing.',
+ f7t:'Move auto rules',f7p:'The AutoRules tab exports rules from a donor account and imports them into chosen targets in bulk, with bulk enable, disable and delete.',
+ f8t:'Currencies & JSON',f8p:'Money thresholds in rules are reconverted into each target\'s currency; rules save to a JSON file and load back — transfer across tokens and browsers.',
+ rules_t:'⚙️ AutoRules',rules_s:'Move automated rules between accounts in three steps',
+ r1t:'Export from the donor',r1p:'Pick the source account and click "Export rules". Tick the rules you want to carry over.',
+ r2t:'Choose targets',r2p:'Tick the target accounts (active/disabled filter + search). Leave threshold conversion into the target currency on.',
+ r3t:'Import',r3p:'Hit "Import" — the rules are created in every target. To move between browsers or tokens, use "To JSON" and "From JSON".',
+ rules_note:'⚠ Unlike the parser, AutoRules <b>writes</b> to accounts (create, delete and toggle rules) — so import and bulk actions ask for confirmation. The rules themselves don\'t launch campaigns.',
  look_t:'How it looks',
  cap1:'Accounts overview, filters and periods',cap2:'Spend recompute overlay',
  footer:'Built by <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Source on <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · MIT License'
@@ -294,7 +326,6 @@ function applyLang(lang,animate){
       var v=(D[lang]&&D[lang][k]!=null)?D[lang][k]:(D.ru[k]!=null?D.ru[k]:'');
       if(el.hasAttribute('data-i18n-html'))el.innerHTML=v;else el.textContent=v;
     });
-    /* код закладки зависит от языка сайта */
     if(window.__pa_code_ru){
       var code=(lang==='en')?window.__pa_code_en:window.__pa_code_ru;
       window.__pa_cur_code=code;
@@ -359,7 +390,6 @@ try{(function(){
   });
 })();}catch(e){}
 
-/* первичная отрисовка текста (код подтянется асинхронно и допереведёт кнопку) */
 applyLang(siteLang,false);
 </script>
 </body>
