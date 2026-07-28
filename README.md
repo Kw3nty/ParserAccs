@@ -6,6 +6,7 @@
 ![Type](https://img.shields.io/badge/type-bookmarklet-2dd4bf?logo=javascript&logoColor=06120f)
 ![i18n](https://img.shields.io/badge/i18n-RU%20%7C%20EN-a78bfa)
 ![License](https://img.shields.io/badge/license-MIT-37d67a)
+[![Release](https://img.shields.io/github/v/release/Kw3nty/ParserAccs?label=download&color=37d67a&logo=github)](https://github.com/Kw3nty/ParserAccs/releases/latest)
 
 <img src="preview.jpg" width="49%" alt="ParserAccs — сводка по кабинетам"> <img src="recount.png" width="49%" alt="ParserAccs — оверлей пересчёта трат">
 
