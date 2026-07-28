@@ -17,7 +17,7 @@
 
 ## ⚡ Установка за 10 секунд
 
-1. Откройте лендинг: **[parseraccs.is-a.dev](https://parseraccs.is-a.dev)** (или `kw3nty.github.io/ParserAccs`).
+1. Откройте лендинг: **[kw3nty.github.io/ParserAccs](https://kw3nty.github.io/ParserAccs/)**
 2. Покажите панель закладок браузера — `Ctrl+Shift+B` (Mac: `⌘+Shift+B`).
 3. **Перетащите** бирюзовую кнопку `📌 ParserAccs` с лендинга на панель закладок. Готово.
 4. Откройте Ads Manager → кликните по закладке.
