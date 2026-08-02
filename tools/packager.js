@@ -3,8 +3,8 @@ const fs=require('fs'),path=require('path'),crypto=require('crypto'),zlib=requir
 const cwd=process.cwd();
 const BASE=(process.env.PA_BASE||'https://kw3nty.github.io/ParserAccs').replace(/\/$/,'');
 const CHUNK=parseInt(process.env.PA_CHUNK||'6000',10);
-const payloadPath=path.join(cwd,'payload.js');
-if(!fs.existsSync(payloadPath)){console.error('payload.js not found in '+cwd);process.exit(1);}
+const payloadPath=path.join(cwd,'parseraccs.js');
+if(!fs.existsSync(payloadPath)){console.error('parseraccs.js not found in '+cwd);process.exit(1);}
 let raw=fs.readFileSync(payloadPath,'utf8');
 if(raw.startsWith('javascript:'))raw=raw.slice('javascript:'.length);   // можно кинуть букмарклет как есть
 const sha=crypto.createHash('sha256').update(raw).digest('hex');
