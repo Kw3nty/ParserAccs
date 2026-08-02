@@ -13,142 +13,65 @@
     min-height: 100vh;
     padding: 40px 20px;
   }
-  .container {
-    max-width: 720px;
-    margin: 0 auto;
-  }
+  .container { max-width: 720px; margin: 0 auto; }
   h1 {
-    font-size: 32px;
-    margin-bottom: 12px;
+    font-size: 32px; margin-bottom: 12px;
     background: linear-gradient(92deg, #fff, #2dd4bf 60%, #3b8cff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  p.lead {
-    color: #9aa0ab;
-    margin-bottom: 24px;
-    line-height: 1.6;
-  }
+  p.lead { color: #9aa0ab; margin-bottom: 24px; line-height: 1.6; }
   .buildbox {
-    background: #141519;
-    border: 1px solid #33373f;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 28px;
+    background: #141519; border: 1px solid #33373f; border-radius: 14px;
+    padding: 22px; margin-bottom: 28px;
   }
   .bm-link {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    text-decoration: none;
-    color: #e8eaef;
+    display: none; align-items: center; justify-content: space-between; gap: 14px;
+    text-decoration: none; color: #e8eaef;
     background: repeating-linear-gradient(45deg, rgba(45,212,191,0.05) 0 12px, transparent 12px 24px);
-    border: 2px dashed rgba(45,212,191,0.5);
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin-bottom: 14px;
-    cursor: grab;
+    border: 2px dashed rgba(45,212,191,0.5); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 14px; cursor: grab;
     transition: transform 0.15s, border-color 0.15s;
   }
-  .bm-link:hover {
-    border-color: #2dd4bf;
-    transform: translateY(-2px);
-  }
+  .bm-link:hover { border-color: #2dd4bf; transform: translateY(-2px); }
   .bm-link:active { cursor: grabbing; }
   .bm-link .label { font-weight: 600; }
   .bm-link .hint { font-size: 11px; color: #9aa0ab; text-align: right; }
-  .actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   button {
-    font: inherit;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 10px 16px;
-    border-radius: 9px;
-    border: none;
-    cursor: pointer;
+    font: inherit; font-weight: 600; font-size: 14px; padding: 10px 16px;
+    border-radius: 9px; border: none; cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
-  .btn-primary {
-    background: #2dd4bf;
-    color: #06120f;
-  }
+  .btn-primary { background: #2dd4bf; color: #06120f; }
   .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
-  .btn-secondary {
-    background: #1f2126;
-    color: #e8eaef;
-    border: 1px solid #33373f;
-  }
-  .btn-secondary:hover:not(:disabled) {
-    border-color: #2dd4bf;
-    color: #2dd4bf;
-  }
+  .btn-secondary { background: #1f2126; color: #e8eaef; border: 1px solid #33373f; }
+  .btn-secondary:hover:not(:disabled) { border-color: #2dd4bf; color: #2dd4bf; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button.flash {
-    background: #37d67a !important;
-    color: #06120f !important;
-  }
-  #build-status {
-    margin-left: auto;
-    font-family: ui-monospace, monospace;
-    font-size: 12px;
-    color: #9aa0ab;
+  button.flash { background: #37d67a !important; color: #06120f !important; }
+  .status-row {
+    display: flex; align-items: center; gap: 12px; margin-left: auto;
+    font-family: ui-monospace, monospace; font-size: 12px; color: #9aa0ab;
   }
   #build-status.ready { color: #37d67a; }
   #build-status.error { color: #ff5d6c; }
+  #build-version { color: #6b7280; }
   .note {
-    margin-top: 14px;
-    font-size: 12px;
-    color: #9aa0ab;
-    line-height: 1.6;
+    margin-top: 14px; font-size: 12px; color: #9aa0ab; line-height: 1.6;
   }
   .note code {
-    background: rgba(255,255,255,0.05);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: #2dd4bf;
-    font-family: ui-monospace, monospace;
-    font-size: 11px;
+    background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;
+    color: #2dd4bf; font-family: ui-monospace, monospace; font-size: 11px;
   }
-  section {
-    margin-top: 40px;
-    padding-top: 28px;
-    border-top: 1px solid #23262e;
-  }
-  h2 {
-    font-size: 20px;
-    margin-bottom: 14px;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-  }
+  section { margin-top: 40px; padding-top: 28px; border-top: 1px solid #23262e; }
+  h2 { font-size: 20px; margin-bottom: 14px; }
+  ul { list-style: none; padding: 0; }
   li {
-    padding: 10px 14px;
-    background: #141519;
-    border: 1px solid #33373f;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    font-family: ui-monospace, monospace;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
+    padding: 10px 14px; background: #141519; border: 1px solid #33373f;
+    border-radius: 8px; margin-bottom: 8px; font-family: ui-monospace, monospace;
+    font-size: 13px; display: flex; justify-content: space-between; gap: 14px;
   }
-  li span.desc {
-    color: #9aa0ab;
-    font-size: 12px;
-  }
-  a {
-    color: #2dd4bf;
-    text-decoration: none;
-  }
+  li span.desc { color: #9aa0ab; font-size: 12px; }
+  a { color: #2dd4bf; text-decoration: none; }
   a:hover { text-decoration: underline; }
 </style>
 </head>
@@ -165,8 +88,11 @@
 
     <div class="actions">
       <button id="copy-btn" class="btn-primary" disabled>📋 Скопировать букмарклет</button>
-      <button id="rebuild-btn" class="btn-secondary" onclick="buildBookmarklet()">🔁 Пересобрать</button>
-      <span id="build-status">⏳ Собираю…</span>
+      <button id="rebuild-btn" class="btn-secondary">🔁 Собрать / повторить</button>
+      <div class="status-row">
+        <span id="build-status">⏳ Собираю…</span>
+        <span id="build-version"></span>
+      </div>
     </div>
 
     <div class="note">
@@ -198,6 +124,16 @@ var BASE = 'https://cdn.jsdelivr.net/gh/Kw3nty/ParserAccs@main/src/';
 
 var bookmarkletCode = '';
 
+// Хеш для индикатора версии
+function hashStr(s) {
+  var h = 5381;
+  for (var i = 0; i < s.length; i++) {
+    h = ((h << 5) + h) ^ s.charCodeAt(i);
+    h |= 0;
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
 // Отрисовать список модулей
 (function(){
   var list = document.getElementById('modules-list');
@@ -210,11 +146,13 @@ var bookmarkletCode = '';
 
 function buildBookmarklet() {
   var statusEl = document.getElementById('build-status');
+  var versionEl = document.getElementById('build-version');
   var linkEl = document.getElementById('bookmarklet-link');
   var copyBtn = document.getElementById('copy-btn');
 
   statusEl.className = '';
   statusEl.textContent = '⏳ Собираю из ' + MODULES.length + ' модулей…';
+  versionEl.textContent = '';
   linkEl.style.display = 'none';
   copyBtn.disabled = true;
 
@@ -229,11 +167,14 @@ function buildBookmarklet() {
     linkEl.href = bookmarkletCode;
     linkEl.style.display = 'flex';
     statusEl.className = 'ready';
-    statusEl.textContent = '✅ Готово (' + Math.round(joined.length/1024) + ' KB)';
+    statusEl.textContent = '✅ Готово';
+    var hv = hashStr(joined).slice(0, 6);
+    versionEl.textContent = 'build · ' + hv + ' · ' + Math.round(joined.length/1024) + 'KB';
     copyBtn.disabled = false;
   }).catch(function(e) {
     statusEl.className = 'error';
     statusEl.textContent = '❌ Ошибка: ' + e.message;
+    versionEl.textContent = 'нажми «Собрать / повторить» через минуту';
     linkEl.style.display = 'none';
     copyBtn.disabled = true;
   });
@@ -275,8 +216,9 @@ function fallbackCopy() {
 }
 
 document.getElementById('copy-btn').onclick = copyBookmarklet;
+document.getElementById('rebuild-btn').onclick = buildBookmarklet;
 
-// Автозапуск при загрузке
+// Автозапуск при загрузке (гибрид: сборка стартует сама + кнопка «Собрать / повторить» всегда доступна)
 window.addEventListener('DOMContentLoaded', function() {
   setTimeout(buildBookmarklet, 200);
 });
