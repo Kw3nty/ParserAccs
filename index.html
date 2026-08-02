@@ -3,225 +3,457 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ParserAccs — парсер кабинетов и автоправила для FB Ads Manager</title>
+<title>ParserAccs — Facebook Ads parser bookmarklet</title>
+<meta name="description" content="Bookmarklet for bulk parsing of Facebook Ads Manager accounts and cross-account automated-rules transfer: balance, spend by period, limits, billing, ad status, BM mapping, CSV export and AutoRules with currency conversion.">
+<meta name="theme-color" content="#0b0d11">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0f1115;
-    color: #e8eaef;
-    min-height: 100vh;
-    padding: 40px 20px;
+  :root{
+    --bg0:#0b0d11; --bg1:#141519; --bg2:#1a1c21; --line:#23262e;
+    --txt:#e8eaef; --mut:#9aa0ab; --teal:#2dd4bf; --blue:#3b8cff;
+    --violet:#a78bfa; --amber:#f5b13d; --green:#37d67a; --red:#ff5d6c;
   }
-  .container { max-width: 720px; margin: 0 auto; }
-  h1 {
-    font-size: 32px; margin-bottom: 12px;
-    background: linear-gradient(92deg, #fff, #2dd4bf 60%, #3b8cff);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'SF Pro Text','Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--bg0); color:var(--txt); line-height:1.6;
+    overflow-x:hidden; -webkit-font-smoothing:antialiased;
   }
-  p.lead { color: #9aa0ab; margin-bottom: 24px; line-height: 1.6; }
-  .buildbox {
-    background: #141519; border: 1px solid #33373f; border-radius: 14px;
-    padding: 22px; margin-bottom: 28px;
-  }
-  .bm-link {
-    display: none; align-items: center; justify-content: space-between; gap: 14px;
-    text-decoration: none; color: #e8eaef;
-    background: repeating-linear-gradient(45deg, rgba(45,212,191,0.05) 0 12px, transparent 12px 24px);
-    border: 2px dashed rgba(45,212,191,0.5); border-radius: 12px;
-    padding: 16px 18px; margin-bottom: 14px; cursor: grab;
-    transition: transform 0.15s, border-color 0.15s;
-  }
-  .bm-link:hover { border-color: #2dd4bf; transform: translateY(-2px); }
-  .bm-link:active { cursor: grabbing; }
-  .bm-link .label { font-weight: 600; }
-  .bm-link .hint { font-size: 11px; color: #9aa0ab; text-align: right; }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  button {
-    font: inherit; font-weight: 600; font-size: 14px; padding: 10px 16px;
-    border-radius: 9px; border: none; cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-  }
-  .btn-primary { background: #2dd4bf; color: #06120f; }
-  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
-  .btn-secondary { background: #1f2126; color: #e8eaef; border: 1px solid #33373f; }
-  .btn-secondary:hover:not(:disabled) { border-color: #2dd4bf; color: #2dd4bf; }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button.flash { background: #37d67a !important; color: #06120f !important; }
-  .status-row {
-    display: flex; align-items: center; gap: 12px; margin-left: auto;
-    font-family: ui-monospace, monospace; font-size: 12px; color: #9aa0ab;
-  }
-  #build-status.ready { color: #37d67a; }
-  #build-status.error { color: #ff5d6c; }
-  #build-version { color: #6b7280; }
-  .note {
-    margin-top: 14px; font-size: 12px; color: #9aa0ab; line-height: 1.6;
-  }
-  .note code {
-    background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;
-    color: #2dd4bf; font-family: ui-monospace, monospace; font-size: 11px;
-  }
-  section { margin-top: 40px; padding-top: 28px; border-top: 1px solid #23262e; }
-  h2 { font-size: 20px; margin-bottom: 14px; }
-  ul { list-style: none; padding: 0; }
-  li {
-    padding: 10px 14px; background: #141519; border: 1px solid #33373f;
-    border-radius: 8px; margin-bottom: 8px; font-family: ui-monospace, monospace;
-    font-size: 13px; display: flex; justify-content: space-between; gap: 14px;
-  }
-  li span.desc { color: #9aa0ab; font-size: 12px; }
-  a { color: #2dd4bf; text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 22px}
+  [data-i18n],[data-i18n-html]{transition:opacity .25s ease}
+  .i18n-fade{opacity:0}
+
+  header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+  .logo{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;font-size:18px;letter-spacing:.4px;
+    background:linear-gradient(92deg,#fff,#2dd4bf 60%,#3b8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .h-right{display:flex;align-items:center;gap:12px}
+  .gh{display:inline-flex;align-items:center;gap:7px;color:var(--mut);text-decoration:none;font-size:13px;font-weight:600;
+    border:1px solid var(--line);border-radius:20px;padding:7px 14px;transition:.18s}
+  .gh:hover{color:var(--teal);border-color:var(--teal);transform:translateY(-1px)}
+
+  .langsw{position:relative;display:inline-flex;align-items:center;background:var(--bg2);border:1px solid var(--line);
+    border-radius:20px;padding:3px;cursor:pointer;user-select:none;font-family:ui-monospace,monospace}
+  .langsw .opt{position:relative;z-index:2;font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--mut);
+    padding:5px 12px;border-radius:16px;transition:color .2s}
+  .langsw .opt.on{color:#06120f}
+  .langsw .knob{position:absolute;z-index:1;top:3px;left:3px;height:calc(100% - 6px);width:calc(50% - 3px);
+    border-radius:16px;background:linear-gradient(135deg,#2dd4bf,#3b8cff);box-shadow:0 2px 10px rgba(45,212,191,.35);
+    transition:transform .26s cubic-bezier(.34,1.4,.5,1)}
+  .langsw.en .knob{transform:translateX(100%)}
+
+  .hero{text-align:center;padding:46px 0 30px}
+  .hero h1{font-family:'Space Grotesk','SF Pro Display',system-ui,sans-serif;font-weight:800;letter-spacing:.5px;
+    font-size:clamp(38px,7vw,72px);line-height:1.02;
+    background:linear-gradient(92deg,#ffffff 0%,#2dd4bf 42%,#3b8cff 70%,#ffffff 100%);background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:tshift 7s linear infinite,tglow 3.6s ease-in-out infinite}
+  @keyframes tshift{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+  @keyframes tglow{0%,100%{filter:drop-shadow(0 0 0 rgba(45,212,191,0))}50%{filter:drop-shadow(0 0 26px rgba(45,212,191,.35))}}
+  .hero p.lead{max-width:680px;margin:18px auto 0;color:var(--mut);font-size:clamp(15px,2.2vw,18px)}
+  .tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .tag{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--teal);background:rgba(45,212,191,.1);
+    border:1px solid rgba(45,212,191,.3);border-radius:20px;padding:5px 12px}
+
+  .install{margin:38px auto 0;max-width:760px;text-align:center;
+    background:linear-gradient(180deg,rgba(26,28,33,.7),rgba(20,21,25,.5));
+    border:1px solid var(--line);border-radius:20px;padding:34px 26px;position:relative;overflow:hidden}
+  .install::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(60% 80% at 50% -10%,rgba(45,212,191,.12),transparent 60%)}
+  .hint-bar{font-size:12px;color:var(--mut);margin-bottom:22px}
+  .hint-bar b{color:var(--txt)}
+  .hint-bar kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);
+    border-radius:5px;padding:1px 7px;font-size:11px;color:var(--teal)}
+
+  .bm-btn{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:grab;user-select:none;
+    font-family:'Space Grotesk',system-ui,sans-serif;font-weight:800;font-size:20px;letter-spacing:.3px;color:#06120f;
+    background:linear-gradient(135deg,#2dd4bf,#3b8cff);border:none;border-radius:16px;padding:18px 38px;text-decoration:none;
+    box-shadow:0 10px 34px rgba(45,212,191,.32),0 0 0 1px rgba(255,255,255,.12) inset;transition:transform .15s,box-shadow .2s}
+  .bm-btn:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(45,212,191,.45)}
+  .bm-btn:active{cursor:grabbing;transform:translateY(-1px)}
+  .bm-btn.loading{filter:grayscale(.4) brightness(.8);cursor:wait}
+  .bm-btn::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;
+    box-shadow:0 0 0 0 rgba(45,212,191,.5);animation:ring 2.2s infinite}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(45,212,191,.45)}70%{box-shadow:0 0 0 16px rgba(45,212,191,0)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+  .drag-hint{margin-top:16px;font-size:13px;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:8px}
+  .drag-hint .arrow{font-size:18px;color:var(--teal);animation:bob 1.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .lang-note{margin-top:10px;font-size:11px;color:var(--mut)}
+  .lang-note b{color:var(--teal)}
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;align-items:center}
+  .copy-btn{font-family:inherit;font-weight:700;font-size:13px;color:var(--txt);cursor:pointer;
+    background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 20px;transition:.15s}
+  .copy-btn:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px)}
+  .copy-btn.ok{background:var(--green);color:#06120f;border-color:var(--green)}
+  .rebuild-btn{font-family:inherit;font-weight:700;font-size:13px;color:var(--txt);cursor:pointer;
+    background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 20px;transition:.15s}
+  .rebuild-btn:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
+  .rebuild-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  #build-status{font-family:ui-monospace,monospace;font-size:12px;color:var(--mut);min-height:18px;line-height:18px}
+  #build-status.ready{color:var(--green)}
+  #build-status.error{color:var(--red)}
+  #build-status.loading{color:var(--amber)}
+  #build-version{font-family:ui-monospace,monospace;font-size:11px;color:var(--mut);opacity:.7}
+  .warn{display:none;margin-top:18px;font-size:12px;color:var(--amber);background:rgba(245,177,61,.08);
+    border:1px solid rgba(245,177,61,.3);border-radius:10px;padding:10px 14px;line-height:1.6;text-align:left}
+  .warn a{color:var(--teal);font-weight:700}
+  .warn code{font-family:ui-monospace,monospace;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px}
+
+  section.block{padding:60px 0 10px}
+  .sec-title{font-family:'Space Grotesk',system-ui,sans-serif;font-weight:800;font-size:clamp(24px,4vw,34px);
+    text-align:center;letter-spacing:.3px}
+  .sec-sub{text-align:center;color:var(--mut);margin-top:8px;font-size:14px}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:34px}
+  .step{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:22px;position:relative;transition:.2s}
+  .step:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px)}
+  .step .n{position:absolute;top:-14px;left:18px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    font-weight:800;font-size:14px;color:#06120f;background:linear-gradient(135deg,#2dd4bf,#3b8cff)}
+  .step h3{font-size:15px;margin:6px 0 8px}
+  .step p{font-size:13px;color:var(--mut)}
+  .step kbd{font-family:ui-monospace,monospace;background:var(--bg2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:11px;color:var(--teal)}
+
+  .feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:34px}
+  .feat{background:var(--bg1);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.2s}
+  .feat:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .feat .ic{font-size:26px;margin-bottom:10px}
+  .feat h3{font-size:15px;margin-bottom:6px}
+  .feat p{font-size:13px;color:var(--mut)}
+  .feat.rules{border-color:rgba(167,139,250,.3)}
+  .feat.rules:hover{border-color:rgba(167,139,250,.55);box-shadow:0 10px 30px rgba(167,139,250,.12)}
+
+  .rules-note{max-width:760px;margin:26px auto 0;font-size:12px;color:var(--amber);background:rgba(245,177,61,.07);
+    border:1px solid rgba(245,177,61,.28);border-radius:12px;padding:12px 16px;line-height:1.6;text-align:center}
+
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:34px}
+  .shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg1);transition:.2s}
+  .shot:hover{border-color:rgba(45,212,191,.4);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
+  .shot a{display:block}
+  .shot img{width:100%;display:block}
+  .shot .cap{padding:10px 14px;font-size:12px;color:var(--mut)}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);margin-top:70px;padding:28px 0;
+    text-align:center;color:var(--mut);font-size:13px}
+  footer a{color:var(--teal);text-decoration:none;font-weight:700}
+  footer a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>ParserAccs</h1>
-  <p class="lead">Букмарклет для Facebook Ads Manager: парсинг кабинетов, экспорт/импорт автоправил между BM. Собирается прямо здесь из модулей на GitHub — без сервера.</p>
+<canvas id="bg-canvas"></canvas>
 
-  <div class="buildbox">
-    <a id="bookmarklet-link" class="bm-link" href="#" title="Перетащи меня в панель закладок">
-      <span class="label">🔖 ParserAccs — перетащи в закладки</span>
-      <span class="hint">drag & drop ↑<br>на панель закладок</span>
-    </a>
-
-    <div class="actions">
-      <button id="copy-btn" class="btn-primary" disabled>📋 Скопировать букмарклет</button>
-      <button id="rebuild-btn" class="btn-secondary">🔁 Собрать / повторить</button>
-      <div class="status-row">
-        <span id="build-status">⏳ Собираю…</span>
-        <span id="build-version"></span>
+<div class="wrap">
+  <header>
+    <div class="logo">ParserAccs</div>
+    <div class="h-right">
+      <div id="langsw" class="langsw" role="switch" aria-label="Language">
+        <span class="knob"></span>
+        <span class="opt" data-lang="ru">RU</span>
+        <span class="opt" data-lang="en">EN</span>
       </div>
+      <a class="gh" href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
     </div>
+  </header>
 
-    <div class="note">
-      Эта сборка содержит только <code>Parser</code> и <code>AutoRules</code>. Модуль клонирования не входит в публичный букмарклет.
+  <div class="hero">
+    <h1>ParserAccs</h1>
+    <p class="lead" data-i18n="lead"></p>
+    <div class="tags">
+      <span class="tag" data-i18n="tag1"></span>
+      <span class="tag" data-i18n="tag2"></span>
+      <span class="tag" data-i18n="tag3"></span>
+      <span class="tag" data-i18n="tag4"></span>
+      <span class="tag" data-i18n="tag5"></span>
     </div>
   </div>
 
-  <section>
-    <h2>Модули в репозитории</h2>
-    <ul id="modules-list"></ul>
-    <p class="note">
-      Код в <a href="https://github.com/Kw3nty/ParserAccs" target="_blank">Kw3nty/ParserAccs</a>. Правь любой модуль — сборка обновится сама через пару минут после push.
-    </p>
+  <div class="install">
+    <div class="hint-bar" data-i18n-html="hint"></div>
+
+    <a id="bm-link" class="bm-btn loading" href="javascript:void(0)" title="Drag me to your bookmarks bar">⏳ …</a>
+
+    <div class="drag-hint"><span class="arrow">↑</span> <span data-i18n="drag"></span></div>
+    <div class="lang-note" data-i18n-html="langnote"></div>
+
+    <div class="actions">
+      <button id="bm-copy" class="copy-btn" data-i18n="copybtn"></button>
+    </div>
+    <div class="actions" style="margin-top:10px;gap:14px">
+      <button id="bm-rebuild" class="rebuild-btn">🔁 Пересобрать</button>
+      <span id="build-status" class="loading">⏳ Инициализация…</span>
+      <span id="build-version"></span>
+    </div>
+
+    <div id="warn" class="warn" data-i18n-html="warn"></div>
+  </div>
+
+  <section class="block">
+    <h2 class="sec-title" data-i18n="how_t"></h2>
+    <p class="sec-sub" data-i18n="how_s"></p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3 data-i18n="s1t"></h3><p data-i18n-html="s1p"></p></div>
+      <div class="step"><span class="n">2</span><h3 data-i18n="s2t"></h3><p data-i18n="s2p"></p></div>
+      <div class="step"><span class="n">3</span><h3 data-i18n="s3t"></h3><p data-i18n="s3p"></p></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec-title" data-i18n="feat_t"></h2>
+    <div class="feats">
+      <div class="feat"><div class="ic">📊</div><h3 data-i18n="f1t"></h3><p data-i18n="f1p"></p></div>
+      <div class="feat"><div class="ic">📅</div><h3 data-i18n="f2t"></h3><p data-i18n="f2p"></p></div>
+      <div class="feat"><div class="ic">🔍</div><h3 data-i18n="f3t"></h3><p data-i18n="f3p"></p></div>
+      <div class="feat"><div class="ic">☑️</div><h3 data-i18n="f4t"></h3><p data-i18n="f4p"></p></div>
+      <div class="feat"><div class="ic">📄</div><h3 data-i18n="f5t"></h3><p data-i18n="f5p"></p></div>
+      <div class="feat"><div class="ic">🔒</div><h3 data-i18n="f6t"></h3><p data-i18n="f6p"></p></div>
+      <div class="feat rules"><div class="ic">🔁</div><h3 data-i18n="f7t"></h3><p data-i18n="f7p"></p></div>
+      <div class="feat rules"><div class="ic">💱</div><h3 data-i18n="f8t"></h3><p data-i18n="f8p"></p></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec-title" data-i18n="rules_t"></h2>
+    <p class="sec-sub" data-i18n="rules_s"></p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3 data-i18n="r1t"></h3><p data-i18n="r1p"></p></div>
+      <div class="step"><span class="n">2</span><h3 data-i18n="r2t"></h3><p data-i18n="r2p"></p></div>
+      <div class="step"><span class="n">3</span><h3 data-i18n="r3t"></h3><p data-i18n="r3p"></p></div>
+    </div>
+    <div class="rules-note" data-i18n="rules_note"></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec-title" data-i18n="look_t"></h2>
+    <div class="shots">
+      <div class="shot"><a href="preview.jpg" target="_blank" rel="noopener"><img src="preview.jpg" alt="ParserAccs main window" loading="lazy" onerror="this.style.display='none'"></a><div class="cap" data-i18n="cap1"></div></div>
+      <div class="shot"><a href="recount.png" target="_blank" rel="noopener"><img src="recount.png" alt="Spend recompute overlay" loading="lazy" onerror="this.style.display='none'"></a><div class="cap" data-i18n="cap2"></div></div>
+    </div>
   </section>
 </div>
 
+<footer data-i18n-html="footer"></footer>
+
 <script>
-/* ===== ПОРЯДОК МОДУЛЕЙ ===== */
-var MODULES = [
-  { name: 'i18n.js',     desc: 'токен, переводы' },
-  { name: 'styles.js',   desc: 'css, утилиты, даты' },
-  { name: 'accounts.js', desc: 'загрузка кабинетов' },
-  { name: 'modal.js',    desc: 'модалка, таблица' },
-  { name: 'rules.js',    desc: 'AutoRules' },
-  { name: 'bindings.js', desc: 'обработчики' }
-];
-var BASE = 'https://cdn.jsdelivr.net/gh/Kw3nty/ParserAccs@main/src/';
-/* =========================== */
+/* ===== частицы на весь фон ===== */
+try{(function(){
+  var c=document.getElementById('bg-canvas');
+  if(!c){return;}
+  var x=c.getContext('2d');if(!x)return;
+  var w,h,p=[],COLS=['45,212,191','45,212,191','45,212,191','59,140,255','167,139,250'],
+      mouse={x:-9999,y:-9999,on:false};
+  function rs(){w=c.width=innerWidth;h=c.height=innerHeight;}
+  function P(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.s=Math.random()*1.6+.7;this.c=COLS[(Math.random()*COLS.length)|0];}
+  P.prototype.u=function(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;};
+  function build(){p=[];var n=Math.min(130,Math.max(40,Math.round(w*h/13000)));for(var i=0;i<n;i++)p.push(new P());}
+  function line(ax,ay,bx,by,col,a){x.beginPath();x.strokeStyle='rgba('+col+','+a.toFixed(3)+')';x.lineWidth=.6;x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke();}
+  rs();build();
+  (function f(){x.clearRect(0,0,w,h);for(var i=0;i<p.length;i++){var a=p[i];a.u();x.shadowColor='rgba('+a.c+',.8)';x.shadowBlur=6;x.beginPath();x.arc(a.x,a.y,a.s,0,6.2832);x.fillStyle='rgba('+a.c+',.65)';x.fill();x.shadowBlur=0;if(mouse.on){var mdx=a.x-mouse.x,mdy=a.y-mouse.y,md=Math.sqrt(mdx*mdx+mdy*mdy);if(md<160)line(a.x,a.y,mouse.x,mouse.y,a.c,.4*(1-md/160));}for(var j=i+1;j<p.length;j++){var b=p[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<125)line(a.x,a.y,b.x,b.y,'45,212,191',.14*(1-d/125));}}requestAnimationFrame(f);})();
+  addEventListener('resize',function(){rs();build();});
+  addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;});
+  addEventListener('mouseout',function(){mouse.on=false;});
+})();}catch(e){}
 
-var bookmarkletCode = '';
+/* ===== словари лендинга ===== */
+var D={
+ru:{
+ lead:'Букмарклет для массового парсинга кабинетов Facebook Ads Manager и переноса автоправил между кабинетами — баланс, траты по любому периоду, лимиты, биллинг, статусы объявлений, привязка к BM, экспорт в CSV и AutoRules с конвертацией валют.',
+ tag1:'Graph API v20.0',tag2:'Read-only парсер',tag3:'Без установки',tag4:'CSV для Excel',tag5:'⚙️ Автоправила',
+ hint:'Сначала покажи панель закладок: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)',
+ drag:'перетащи кнопку на панель закладок',
+ langnote:'Язык интерфейса парсера задаётся здесь: перетащенная закладка откроется на <b>выбранном языке</b>. По умолчанию — язык твоего браузера (прокси не влияют).',
+ copybtn:'📋 Скопировать код',
+ warn:'⚠ <span class="pa-wmsg">Код букмарклета не подгрузился.</span> Проверь, что модули <code>src/*.js</code> лежат в репозитории <a href="https://github.com/Kw3nty/ParserAccs" target="_blank">Kw3nty/ParserAccs</a>. Через 1–2 минуты после push нажми «🔁 Пересобрать».',
+ how_t:'Как установить',how_s:'Никаких расширений и установок — одна закладка',
+ s1t:'Покажи панель закладок',s1p:'Нажми <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>, чтобы сверху появилась полоса закладок.',
+ s2t:'Перетащи кнопку',s2p:'Зажми кнопку ParserAccs выше и брось её на панель закладок. На телефоне — «Скопировать код» и создай закладку вручную.',
+ s3t:'Запусти в Ads Manager',s3p:'Открой Facebook Ads Manager и кликни по закладке. Готово — таблица кабинетов и вкладка AutoRules перед тобой.',
+ feat_t:'Что умеет',
+ f1t:'Полная сводка',f1p:'ID, имя, статус, баланс, валюта, траты за всё время и за период, лимит, биллинг, активные и отклонённые объявления, BM.',
+ f2t:'Любой период',f2p:'Today, Yesterday, 7/14/30 дней, месяц, Lifetime и свои даты. Популярные периоды — мгновенно из кэша.',
+ f3t:'Фильтры и поиск',f3p:'Все / Активные / Неактивные, поиск по ID, имени и BM, сортировка по любой колонке.',
+ f4t:'Выделение',f4p:'Отмечай кабинеты чекбоксами и копируй ID или выгружай CSV только по выбранным.',
+ f5t:'CSV для Excel',f5p:'Кириллица и разделитель sep=, — файл сразу разъезжается по столбцам.',
+ f6t:'Read-only парсер',f6p:'Вкладка кабинетов только читает через официальный Graph API и ничего не меняет.',
+ f7t:'Перенос автоправил',f7p:'Вкладка AutoRules: экспорт правил из кабинета‑донора и импорт в выбранные цели пачкой, с массовым включением, выключением и удалением.',
+ f8t:'Валюты и JSON',f8p:'Денежные пороги правил пересчитываются под валюту каждой цели; правила сохраняются в JSON‑файл и грузятся обратно — перенос между токенами и браузерами.',
+ rules_t:'⚙️ AutoRules',rules_s:'Перенос автоправил между кабинетами за три шага',
+ r1t:'Экспорт из донора',r1p:'Выбери кабинет‑источник и нажми «Экспорт правил». Отметь галочками, какие правила переносить.',
+ r2t:'Выбери цели',r2p:'Отметь целевые кабинеты (фильтр актив/неактив + поиск). Оставь включённой конвертацию порогов под валюту цели.',
+ r3t:'Импортируй',r3p:'Жми «Импортировать» — правила создадутся во всех целях. Для переноса между браузерами/токенами используй «В JSON» и «Из JSON».',
+ rules_note:'⚠ В отличие от парсера, AutoRules пишет в кабинеты (создание, удаление и смена статуса правил) — поэтому на импорт и массовые действия стоит подтверждение. Сами рекламные кампании правила не запускают.',
+ look_t:'Как выглядит',
+ cap1:'Сводка по кабинетам, фильтры и периоды',cap2:'Оверлей пересчёта трат по периоду',
+ footer:'Сделал <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Исходники на <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · Лицензия MIT'
+},
+en:{
+ lead:'A bookmarklet for bulk parsing of Facebook Ads Manager accounts and cross-account automated-rules transfer — balance, spend for any period, daily limits, billing threshold, ad status, BM mapping, CSV export and AutoRules with currency conversion.',
+ tag1:'Graph API v20.0',tag2:'Read-only parser',tag3:'No install',tag4:'Excel-ready CSV',tag5:'⚙️ Auto rules',
+ hint:'First show the bookmarks bar: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)',
+ drag:'drag the button onto your bookmarks bar',
+ langnote:'The parser UI language is set here: the installed bookmark opens in the <b>selected language</b>. Default = your browser language (proxies don\'t affect it).',
+ copybtn:'📋 Copy code',
+ warn:'⚠ <span class="pa-wmsg">Bookmarklet code failed to load.</span> Check that modules <code>src/*.js</code> exist in the <a href="https://github.com/Kw3nty/ParserAccs" target="_blank">Kw3nty/ParserAccs</a> repo. Wait 1–2 min after a push and click "🔁 Rebuild".',
+ how_t:'How to install',how_s:'No extensions, no setup — a single bookmark',
+ s1t:'Show the bookmarks bar',s1p:'Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> so the bookmarks bar appears on top.',
+ s2t:'Drag the button',s2p:'Grab the ParserAccs button above and drop it on the bookmarks bar. On mobile — copy the code and create a bookmark manually.',
+ s3t:'Run it in Ads Manager',s3p:'Open Facebook Ads Manager and click the bookmark. Done — the accounts table and the AutoRules tab are yours.',
+ feat_t:'What it does',
+ f1t:'Full overview',f1p:'ID, name, status, balance, currency, lifetime and period spend, limit, billing, active and disapproved ads, BM.',
+ f2t:'Any period',f2p:'Today, Yesterday, 7/14/30 days, month, Lifetime and custom dates. Popular periods are instant from cache.',
+ f3t:'Filters & search',f3p:'All / Active / Disabled, search by ID, name and BM, sort by any column.',
+ f4t:'Selection',f4p:'Tick accounts with checkboxes and copy IDs or export CSV for the selected ones only.',
+ f5t:'Excel-ready CSV',f5p:'UTF-8 BOM and the sep=, hint — the file splits into columns on open.',
+ f6t:'Read-only parser',f6p:'The accounts tab only reads via the official Graph API and changes nothing.',
+ f7t:'Move auto rules',f7p:'The AutoRules tab exports rules from a donor account and imports them into chosen targets in bulk, with bulk enable, disable and delete.',
+ f8t:'Currencies & JSON',f8p:'Money thresholds in rules are reconverted into each target\'s currency; rules save to a JSON file and load back — transfer across tokens and browsers.',
+ rules_t:'⚙️ AutoRules',rules_s:'Move automated rules between accounts in three steps',
+ r1t:'Export from the donor',r1p:'Pick the source account and click "Export rules". Tick the rules you want to carry over.',
+ r2t:'Choose targets',r2p:'Tick the target accounts (active/disabled filter + search). Leave threshold conversion into the target currency on.',
+ r3t:'Import',r3p:'Hit "Import" — the rules are created in every target. To move between browsers or tokens, use "To JSON" and "From JSON".',
+ rules_note:'⚠ Unlike the parser, AutoRules writes to accounts (create, delete and toggle rules) — so import and bulk actions ask for confirmation. The rules themselves don\'t launch campaigns.',
+ look_t:'How it looks',
+ cap1:'Accounts overview, filters and periods',cap2:'Spend recompute overlay',
+ footer:'Built by <a href="https://t.me/kw33nty" target="_blank" rel="noopener">Kwenty</a> · Source on <a href="https://github.com/Kw3nty/ParserAccs" target="_blank" rel="noopener">GitHub</a> · MIT License'
+}
+};
 
-// Хеш для индикатора версии
-function hashStr(s) {
-  var h = 5381;
-  for (var i = 0; i < s.length; i++) {
-    h = ((h << 5) + h) ^ s.charCodeAt(i);
-    h |= 0;
-  }
-  return (h >>> 0).toString(16).padStart(8, '0');
+/* ===== язык: дефолт = память || язык браузера (НЕ ip — прокси ломают ip) ===== */
+function detectLang(){
+  try{var s=localStorage.getItem('pa_site_lang');if(s==='ru'||s==='en')return s;}catch(e){}
+  var nl=(navigator.language||navigator.userLanguage||'').toLowerCase();
+  return nl.indexOf('ru')===0?'ru':'en';
+}
+var siteLang=detectLang();
+
+function applyLanguage(lang,animate){
+  siteLang=lang;
+  try{localStorage.setItem('pa_site_lang',lang);}catch(e){}
+  document.documentElement.lang=lang;
+  var sw=document.getElementById('langsw');
+  if(sw){sw.classList.toggle('en',lang==='en');sw.querySelectorAll('.opt').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-lang')===lang);});}
+  var nodes=document.querySelectorAll('[data-i18n],[data-i18n-html]');
+  var paint=function(){
+    nodes.forEach(function(el){
+      var k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-html');
+      var v=(D[lang]&&D[lang][k]!=null)?D[lang][k]:(D.ru[k]!=null?D.ru[k]:'');
+      if(el.hasAttribute('data-i18n-html'))el.innerHTML=v;else el.textContent=v;
+    });
+    if(window.__pa_code_ru){
+      var code=(lang==='en')?window.__pa_code_en:window.__pa_code_ru;
+      window.__pa_cur_code=code;
+      var link=document.getElementById('bm-link');
+      if(link&&!link.classList.contains('loading'))link.href=code;
+    }
+    if(animate)nodes.forEach(function(el){el.classList.remove('i18n-fade');});
+  };
+  if(animate){nodes.forEach(function(el){el.classList.add('i18n-fade');});setTimeout(paint,180);}
+  else paint();
 }
 
-// Отрисовать список модулей
-(function(){
-  var list = document.getElementById('modules-list');
-  MODULES.forEach(function(m, i) {
-    var li = document.createElement('li');
-    li.innerHTML = '<span>' + (i+1) + '. ' + m.name + '</span><span class="desc">' + m.desc + '</span>';
-    list.appendChild(li);
-  });
-})();
+document.getElementById('langsw').addEventListener('click',function(){
+  applyLanguage(siteLang==='ru'?'en':'ru',true);
+});
 
-function buildBookmarklet() {
-  var statusEl = document.getElementById('build-status');
-  var versionEl = document.getElementById('build-version');
-  var linkEl = document.getElementById('bookmarklet-link');
-  var copyBtn = document.getElementById('copy-btn');
+/* ===== ГИБРИДНАЯ СБОРКА букмарклета из модулей src/ ===== */
+var MODULES=['i18n.js','styles.js','accounts.js','modal.js','rules.js','bindings.js'];
+var BASE='https://cdn.jsdelivr.net/gh/Kw3nty/ParserAccs@main/src/';
 
-  statusEl.className = '';
-  statusEl.textContent = '⏳ Собираю из ' + MODULES.length + ' модулей…';
-  versionEl.textContent = '';
-  linkEl.style.display = 'none';
-  copyBtn.disabled = true;
+function hashStr(s){var h=5381;for(var i=0;i<s.length;i++){h=((h<<5)+h)^s.charCodeAt(i);h|=0;}return (h>>>0).toString(16).padStart(8,'0');}
 
-  Promise.all(MODULES.map(function(m) {
-    return fetch(BASE + m.name + '?v=' + Date.now()).then(function(r) {
-      if (!r.ok) throw new Error(m.name + ' → ' + r.status);
+function buildBookmarklet(){
+  var link=document.getElementById('bm-link'),
+      copy=document.getElementById('bm-copy'),
+      warn=document.getElementById('warn'),
+      drag=document.querySelector('.drag-hint'),
+      status=document.getElementById('build-status'),
+      version=document.getElementById('build-version'),
+      rebuild=document.getElementById('bm-rebuild');
+
+  link.classList.add('loading');
+  link.href='javascript:void(0)';
+  link.textContent='⏳ …';
+  link.style.filter='';
+  if(status){status.className='loading';status.textContent=(siteLang==='en'?'⏳ Building from '+MODULES.length+' modules…':'⏳ Собираю из '+MODULES.length+' модулей…');}
+  if(version)version.textContent='';
+  if(drag)drag.style.display='flex';
+  if(warn)warn.style.display='none';
+  if(copy)copy.disabled=true;
+  if(rebuild)rebuild.disabled=true;
+
+  var ts=Date.now();
+  Promise.all(MODULES.map(function(m){
+    return fetch(BASE+m+'?v='+ts).then(function(r){
+      if(!r.ok)throw new Error(m+' → HTTP '+r.status);
       return r.text();
     });
-  })).then(function(txts) {
-    var joined = txts.join('\n');
-    bookmarkletCode = 'javascript:' + joined;
-    linkEl.href = bookmarkletCode;
-    linkEl.style.display = 'flex';
-    statusEl.className = 'ready';
-    statusEl.textContent = '✅ Готово';
-    var hv = hashStr(joined).slice(0, 6);
-    versionEl.textContent = 'build · ' + hv + ' · ' + Math.round(joined.length/1024) + 'KB';
-    copyBtn.disabled = false;
-  }).catch(function(e) {
-    statusEl.className = 'error';
-    statusEl.textContent = '❌ Ошибка: ' + e.message;
-    versionEl.textContent = 'нажми «Собрать / повторить» через минуту';
-    linkEl.style.display = 'none';
-    copyBtn.disabled = true;
+  })).then(function(txts){
+    var joined=txts.join('\n').replace(/^\uFEFF/,'').trim();
+    var src;
+    if(joined.indexOf('javascript:')===0) src=joined;
+    else src='javascript:'+joined;
+
+    window.__pa_code_ru=src;
+    window.__pa_code_en=src.replace(/^javascript:/,'javascript:var PA_LANG="en";');
+    window.__pa_cur_code=(siteLang==='en')?window.__pa_code_en:window.__pa_code_ru;
+
+    link.href=window.__pa_cur_code;
+    link.classList.remove('loading');
+    link.textContent='📌 ParserAccs';
+    link.title=(siteLang==='en'?'Drag me to your bookmarks bar':'Перетащи меня на панель закладок');
+    link.style.filter='';
+
+    var hv=hashStr(src).slice(0,6);
+    var kb=Math.round(src.length/1024);
+    if(status){status.className='ready';status.textContent=(siteLang==='en'?'✓ Ready':'✓ Готово');}
+    if(version)version.textContent='build · '+hv+' · '+kb+'KB';
+    if(copy)copy.disabled=false;
+    if(rebuild)rebuild.disabled=false;
+
+    applyLanguage(siteLang,false);
+  }).catch(function(e){
+    link.classList.remove('loading');
+    link.textContent='📌 ParserAccs';
+    link.style.filter='grayscale(.5) brightness(.85)';
+    if(drag)drag.style.display='none';
+    if(status){status.className='error';status.textContent=(siteLang==='en'?'✗ Error: '+e.message:'✗ Ошибка: '+e.message);}
+    if(version)version.textContent=(siteLang==='en'?'try "🔁 Rebuild" in 1–2 min':'нажми «🔁 Пересобрать» через 1–2 мин');
+    if(warn){warn.style.display='block';var m=warn.querySelector('.pa-wmsg');if(m)m.textContent=(siteLang==='en'?'Bookmarklet code failed to load.':'Код букмарклета не подгрузился.');}
+    if(copy)copy.disabled=true;
+    if(rebuild)rebuild.disabled=false;
   });
 }
 
-function copyBookmarklet() {
-  if (!bookmarkletCode) return;
-  var btn = document.getElementById('copy-btn');
+/* ===== инициализация ===== */
+try{(function(){
+  var link=document.getElementById('bm-link'),
+      copy=document.getElementById('bm-copy'),
+      rebuild=document.getElementById('bm-rebuild');
 
-  var done = function() {
-    btn.classList.add('flash');
-    var orig = btn.textContent;
-    btn.textContent = '✓ Скопировано';
-    setTimeout(function() {
-      btn.classList.remove('flash');
-      btn.textContent = orig;
-    }, 1500);
-  };
+  link.addEventListener('click',function(e){e.preventDefault();});
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(bookmarkletCode).then(done).catch(function() {
-      fallbackCopy();
-      done();
-    });
-  } else {
-    fallbackCopy();
-    done();
+  if(rebuild){
+    rebuild.textContent=(siteLang==='en'?'🔁 Rebuild':'🔁 Пересобрать');
+    rebuild.addEventListener('click',function(){buildBookmarklet();});
   }
-}
 
-function fallbackCopy() {
-  var ta = document.createElement('textarea');
-  ta.value = bookmarkletCode;
-  ta.style.cssText = 'position:fixed;opacity:0';
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand('copy'); } catch(e) {}
-  ta.remove();
-}
+  if(copy){
+    copy.addEventListener('click',function(){
+      var code=window.__pa_cur_code;
+      if(!code){document.getElementById('warn').style.display='block';return;}
+      var btn=this,done=function(){btn.classList.add('ok');var o=btn.textContent;btn.textContent=(siteLang==='en'?'✓ Copied':'✓ Скопировано');setTimeout(function(){btn.classList.remove('ok');btn.textContent=D[siteLang].copybtn;},1600);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done).catch(fallback);}
+      else fallback();
+      function fallback(){var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();}
+    });
+  }
 
-document.getElementById('copy-btn').onclick = copyBookmarklet;
-document.getElementById('rebuild-btn').onclick = buildBookmarklet;
+  /* АВТО-сборка при загрузке */
+  buildBookmarklet();
+})();}catch(e){}
 
-// Автозапуск при загрузке (гибрид: сборка стартует сама + кнопка «Собрать / повторить» всегда доступна)
-window.addEventListener('DOMContentLoaded', function() {
-  setTimeout(buildBookmarklet, 200);
-});
+applyLanguage(siteLang,false);
 </script>
 </body>
 </html>
