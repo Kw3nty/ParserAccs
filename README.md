@@ -93,29 +93,6 @@
 - Тумблер **RU / EN** на лендинге определяет язык *закладки*, которую вы перетаскиваете.
 - Кнопка **🌐** в шапке парсера меняет язык на лету, без потери загруженных данных, и пишет выбор в `localStorage`.
 - Лендинг — одностраничник на GitHub Pages с фоновой анимацией частиц, секциями «как установить / что умеет / скрины» и кнопкой‑букмарклетом для drag&drop. Хостинг бесплатный, адрес — `kw3nty.github.io/ParserAccs` 
----
-
-## ❓ Частые вопросы
-
-**Ссылка на кабинет ведёт не туда.** Обновите закладку — ссылки теперь в прямом формате `…/campaigns?act=<число>` без `business_id`, который и вызывал редирект.
-
-**CSV открывается в Excel одной колонкой.** В актуальной версии в начало файла пишется `sep=,` — Excel сам разбивает столбцы. На старой закладке — обновите её.
-
-**Поиск не находит кабинет по букве.** Проверьте раскладку: имена и BM обычно в латиннице, а русская «В» и латинская `B` — разные символы.
-
-**При импорте правил ошибка про PAUSE и стоимость.** Это ограничение самого Facebook: правило с действием PAUSE не может иметь условий по стоимости. Такое правило нужно поправить в доноре — лог покажет точное сообщение Meta по каждому правилу.
-
-**Это безопасно?** Парсер делает только GET‑запросы к официальному Graph API и обрабатывает данные локально в браузере, ничего не отправляя на сторонние серверы. Вкладка AutoRules пишет правила в *ваши* кабинеты через *ваш* токен — и всегда с подтверждением. Вы используете инструмент на свой риск.
-
----
-
-## 📁 Структура репозитория
-
-- `parseraccs.js` — код букмарклета (один файл, одна точка поддержки; лендинг подтягивает его сам).
-- `index.html` — лендинг на GitHub Pages.
-- `README.md` — этот файл.
-- `LICENSE` — MIT.
-- `preview.jpg`, `recount.png` — скрины интерфейса.
 
 ---
 
@@ -133,7 +110,6 @@
 
 </div>
 
----
 ---
 
 <a id="english"></a>
@@ -187,17 +163,6 @@ A rules manager: export from a donor account and import into chosen targets, fol
 
 The UI is fully bilingual — **RU and EN**. The default follows the browser language (`navigator.language`), not the IP — which matters behind proxies where geo always reads US. The landing‑page toggle sets the language of the bookmark you drag; the **🌐** button inside the parser switches on the fly and persists to `localStorage`. The landing page itself is a single‑page site on GitHub Pages with a particle background, install / features / screenshots sections and a drag‑and‑drop bookmarklet button, served for free at `kw3nty.github.io/ParserAccs`
 
-### ❓ FAQ
-
-**Account link goes to the wrong place.** Update the bookmark — links now use the direct `…/campaigns?act=<number>` format without `business_id`, which caused the redirect.
-
-**CSV opens as one column in Excel.** The current version writes `sep=,` at the top so Excel splits the columns. On an old bookmark, update it.
-
-**Search misses an account by a letter.** Check your keyboard layout — names and BMs are usually Latin, and Cyrillic “В” and Latin `B` are different characters.
-
-**Rule import complains about PAUSE and cost.** That's Facebook's own rule: a PAUSE action can't carry cost conditions. Fix that rule in the donor — the log shows Meta's exact message per rule.
-
-**Is it safe?** The parser makes only GET requests to the official Graph API and processes data locally in the browser, sending nothing to third parties. The AutoRules tab writes rules into *your* accounts with *your* token — and always with a confirmation. You use the tool at your own risk.
 
 <div align="center">
 
