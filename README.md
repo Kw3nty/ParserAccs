@@ -2,7 +2,7 @@
 
 **🇷🇺 Русский** · [🇬🇧 English](#english)
 
-![Facebook Graph API](https://img.shields.io/badge/Graph%20API-v20.0-1877F2?logo=facebook&logoColor=white)
+![Facebook Graph API](https://img.shields.io/badge/Graph%20API-v25.0-1877F2?logo=facebook&logoColor=white)
 ![Type](https://img.shields.io/badge/type-bookmarklet-2dd4bf?logo=javascript&logoColor=06120f)
 ![i18n](https://img.shields.io/badge/i18n-RU%20%7C%20EN-a78bfa)
 ![License](https://img.shields.io/badge/license-MIT-37d67a)
