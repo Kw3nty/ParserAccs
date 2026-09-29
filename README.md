@@ -17,7 +17,7 @@
 
 ## ⚡ Установка за 10 секунд
 
-1. Откройте лендинг: **[kw3nty.github.io/ParserAccs](https://kw3nty.github.io/ParserAccs/)**
+1. Откройте лендинг: **[fbads.fun](https://fbads.fun)**
 2. Покажите панель закладок браузера — `Ctrl+Shift+B` (Mac: `⌘+Shift+B`).
 3. **Перетащите** бирюзовую кнопку `📌 ParserAccs` с лендинга на панель закладок. Готово.
 4. Откройте Ads Manager → кликните по закладке.
@@ -91,7 +91,7 @@
 - Дефолтный язык берётся из настроек браузера (`navigator.language`), а не по IP — это важно для арбитражников за прокси, где геолокация всегда US.
 - Тумблер **RU / EN** на лендинге определяет язык *закладки*, которую вы перетаскиваете.
 - Кнопка **🌐** в шапке парсера меняет язык на лету, без потери загруженных данных, и пишет выбор в `localStorage`.
-- Лендинг — одностраничник на GitHub Pages с фоновой анимацией частиц, секциями «как установить / что умеет / скрины» и кнопкой‑букмарклетом для drag&drop. Хостинг бесплатный, адрес — `kw3nty.github.io/ParserAccs` 
+- Лендинг — одностраничник на GitHub Pages с фоновой анимацией частиц, секциями «как установить / что умеет / скрины» и кнопкой‑букмарклетом для drag&drop. Хостинг бесплатный, адрес — `fbads.fun` 
 
 ---
 
@@ -121,7 +121,7 @@ No install. One bookmark and it's yours.
 
 ### ⚡ Install in 10 seconds
 
-1. Open the landing page: **[kw3nty.github.io/ParserAccs](https://kw3nty.github.io/ParserAccs/)**
+1. Open the landing page: **[fbads.fun](https://fbads.fun)**
 2. Show the bookmarks bar — `Ctrl+Shift+B` (Mac: `⌘+Shift+B`).
 3. **Drag** the teal `📌 ParserAccs` button onto the bookmarks bar. Done.
 4. Open Ads Manager and click the bookmark.
@@ -160,7 +160,7 @@ A rules manager: export from a donor account and import into chosen targets, fol
 
 ### 🌐 Languages & landing page
 
-The UI is fully bilingual — **RU and EN**. The default follows the browser language (`navigator.language`), not the IP — which matters behind proxies where geo always reads US. The landing‑page toggle sets the language of the bookmark you drag; the **🌐** button inside the parser switches on the fly and persists to `localStorage`. The landing page itself is a single‑page site on GitHub Pages with a particle background, install / features / screenshots sections and a drag‑and‑drop bookmarklet button, served for free at `kw3nty.github.io/ParserAccs`
+The UI is fully bilingual — **RU and EN**. The default follows the browser language (`navigator.language`), not the IP — which matters behind proxies where geo always reads US. The landing‑page toggle sets the language of the bookmark you drag; the **🌐** button inside the parser switches on the fly and persists to `localStorage`. The landing page itself is a single‑page site on GitHub Pages with a particle background, install / features / screenshots sections and a drag‑and‑drop bookmarklet button, served for free at `fbads.fun`
 
 
 <div align="center">
