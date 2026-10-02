@@ -170,3 +170,15 @@ The UI is fully bilingual — **RU and EN**. The default follows the browser lan
 [🇷🇺 Русский ↑](#top) · [⬆ Top](#top)
 
 </div>
+
+## Self-updating loader and hosting
+
+The install button on `fbads.fun` now contains a small stable loader instead of the full payload. Releases are assembled into one `parseraccs.js`, packaged as a SHA-256 verified Open Graph manifest/chunk, and cached in the Ads Manager tab. Users keep the same bookmark while new builds are delivered automatically.
+
+```bash
+npm ci
+npm run check
+npm run build
+```
+
+Cloudflare Pages publishes `dist`. Without a Facebook scrape token, refresh the manifest and chunk URLs listed in the deploy job summary manually in Facebook Sharing Debugger. See `HOSTING.md`.
